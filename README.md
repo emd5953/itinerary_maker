@@ -123,12 +123,6 @@ A web application to help travelers efficiently plan their trips. Users can defi
 
 ---
 
-## License
-
-This project is licensed under the [MIT License](https://opensource.org/licenses/MIT). You are free to use, modify, and distribute this software as permitted under the license terms.
-
----
-
 **Happy Planning!**  
 Have questions, suggestions, or feedback? Feel free to open an issue or reach out to our team.  
 Enjoy creating your next unforgettable journey with **Itinerary Maker**!
