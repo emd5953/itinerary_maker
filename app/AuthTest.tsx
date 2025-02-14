@@ -1,7 +1,7 @@
 // app/AuthTest.tsx
 "use client";
 
-import { signIn, signOut, useSession } from "next-auth/react";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 export default function AuthTest() {
   const { data: session, status } = useSession();
