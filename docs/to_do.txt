@@ -1,0 +1,128 @@
+"yo bro i know a spot :0>" - aSpot 
+
+1. Core Features 
+  1. User Input : Date Range Of Travel
+                : Destination (s)
+                : Interests (e.g., sights, outdoor activities, food, nightlife)
+                : Budget or travel style (luxury, mid-range, backpacker)
+2. Acitivity & Sigh Recommendations
+  : Provide Popular and off-the-beaten-path attractions
+  : Suggest Activities based on user interests.
+  : Include relevant details (Links to Websites, Description on the websites/activities).
+3. Map Integration & Navigation
+   : Get User Familiar with the destination's mode of transport and delivery
+     Ex: Uber Equivalent 
+   : Show how to get from one spot to another
+   : Indicate costs for modes of transports
+   : Integrate with ride-sharing or public transit 
+4. Organzer Feature in App 
+   : Organize activites by day and time 
+   : Setup reminder facility, also add google calenders and such 
+   : Let users rearrange or customize the schedule 
+   : Prevent conflicts between activities 
+   : Maybe add healthcare suggestions on resting and leisure time 
+   : An AI that is aware if users are "doing too much". Humorous feature
+5. Collaboration and sharing
+   : Is able to share itineraries with friends through app or even pdf version
+   : Provide editing permission so group members can collaborate 
+   : Not envisioning it like a document, more like uber's collabs where you have the option to
+     raise a finger to point out thoughts through a description and "apply" for a change with options to vote 
+     on a suggested activity 
+  : Offline collab will be a pdf file or word docs 
+
+2. Technical Architecture
+   1. Frontend 
+      : React 
+            : Next.js adds server-side rendering (SSR) and easy API routes 
+              - Handles routing with a file-based system (React alone can use react router)
+            : Language - Typescript for type safety and better tooling 
+      : UI/Styling - Tailwind CSS, Material UI, or Chakra UI (speeds up development)
+      : State Management - React Hooks (Context API) or a library like Redux Toolkit/Recoil if application grows complex 
+                         - Chose Redux as it is an industry standard 
+   2. Backend
+      : Platform - Node.js
+      : Framework - Express.js - Lightweight and widely adopted
+                  - NestJS - Opinionated, TypeScript-first approach with built-in modules (controllers, providers, etc.)
+                             that resemble Angular’s structure. 
+                  - Express.js - Heavily used in the industry and is simple.
+      : API Design : REST is straightforward to implement with Express or Nest.
+                   : Calling Google Maps 
+                   : Flights/Hotel Searchs - Skyscanner, booking.com, airbnb, etc. 
+                   : Location attractions - Yelp, Google Places, etc.                  
+      : GraphQL : Option if you want to showcase more advanced design (Apollo Server on Node, for example)
+      : Authentication - JWT (JSON Web Tokens) is common and well-understood, or you can use sessions if that fits workflow better 
+                       - Libraries like Passport.js or Auth0 integrations can streamline auth and look good on CV 
+                       - FINALIZED
+                         - NextAuth.js will be used as it enables multiple login methods.
+                           - Such as google, facebook, email or a custom username/password.
+   3. Database 
+      : Relational : PostgreSQL (open-source SQL highly regarded in industry)
+                   : ORM - Prisma or TypeORM can help manage schema and migrations in TypeScript 
+      : NoSQL : MongoDB : 'M' in the mernstack. Popular and widely-used 
+              : ODM: Mongoose is a common choice for schema definitions in MongoDB
+      : Recommendations : For an itinerary application—where you might store user profiles, itinerary items,
+                          and references to external data—PostgreSQL (with Prisma) is a great choice
+                          if you want to demonstrate strong relational modeling skills.
+                        : If you prefer more flexibility and document-based storage, 
+                          MongoDB is equally valid and marketable.
+              FINALIZATION : MongoDB as this is what I have been using a lot recently.
+   4. Deployment & DevOps
+      : TBA 
+
+3. UX and Design 
+   1. Onboarding : Guide users through defining their destination, travel dates, and interests.
+                 : Suggest top attractions or help them discover new experiences.
+   2. Interactive Scheduler : A drag-and-drop calender or timeline for day-to-day planning.
+                            : Visual indicators (e.g., color-coded tags) for different types of activities (outdoor, cultural, dining, etc)
+   3. Flexible Editing : Allow users to insert personal events, break times or appointments.
+                       : Make it easy to swap or remove activities.
+   4. Recommendations : A well-designed recommendation engine can highlight attractions that match users interests.
+                      : Consider user-reviews, popularity rankings, seasonal events.
+   5. Notifications and Reminders : Remind users when activity start times are approaching. 
+                                  : Alert about ticket availability, ideal time for booking suggestions, 
+                                    or price changes for flight/accomdodations
+
+4. Building Intelligence & Personalization
+   1. User Profiles : Track user preferences (Favorite destinations, travel style, dietary restrictions)
+                    : Offer personalized suggestions based on past itineraries or common user patterns.
+   2. Machine Learning/AI : A recommendation engine could use ellaborative filtering or content-based filtering
+                            to suggest attractions.
+                          : Potential for dynamic itinerary adjustments based on real-time data (e.g., weather, travel, advisories).
+   3. Smart Scheduling : Automatically sort and allocate activities to the best time slots (e.g., group nearby places 
+                         to reduce travel time, factor in best visiting hours).
+                       : Consider using optimization algorithms (travelling salesman-like logic) to minimize transit times 
+                         and maximize enjoyment.
+
+5. Monetization & Business Model 
+   1. Freemium Model : Basic itinerary features free; premium features (advanced customization, offline access, AI-based recommendations)
+                       available via subscription 
+   2. Affiliate Partnerships : Earn commissions by directing users to booking platforms (hotels, tours, flights).
+                             : Integrate with third-party booking sites through affiliate programs (Booking.com, Expedia, etc.).
+   3. Sponsored Content : Local businesses can pay to appear in top suggestions (though ensure it doesn’t compromise user trust).
+   4. One-Time Purchases : Charge a small fee for single itineraries or specialized travel guides. 
+
+6. Practical Considerations
+   1. Scalability : Plan for traffic spikes during busy travel seasons.
+                  : Ensure your cloud architecture can handle scaling (AWS, Google Cloud, Azure).
+   2. Data Accuracy & Reliability : Always keep track of data source reliability.
+                                  : Provide disclaimers if certain information (e.g., operating hours) may be out of date.
+  3. Legal & Compliance : Check regulations for using map/attraction data (Google Maps usage limits, attribution requirements).
+                        : Handle user data responsibly; follow GDPR/CCPA if applicable.
+  4. Localization : If serving multiple regions, consider localizing content in multiple languages.
+                  : Date/time formatting, currency, and user interface text should adapt based on location.
+
+7. Development Roadmap Example
+   1. MVP (Minimum Viable Product) : Basic user registration and login.
+                                   : Simple itinerary builder (user inputs destination, dates, 
+                                     and receives a list of recommended attractions).
+                                   : Ability to add/remove items from an itinerary and reorder them.
+   2. v1.1: Map & Routing :Integrate a mapping API for directions and travel time.
+                          :Show route suggestions on a map.
+   3. v1.2: Collaboration & Sharing : Invite friends to view or edit your itinerary.
+                                    : Share a read-only link to an itinerary.
+   4. v1.3: Advanced Recommendations : Personalize suggestions based on user data.
+                                     : Factor in real-time conditions (weather, peak/off-peak hours).
+   5. v1.4: Premium Features : Offline capability.
+                             : Integration with booking systems for flights, hotels, tours.
+                             : In-app payment for premium itinerary templates or guides.
+
