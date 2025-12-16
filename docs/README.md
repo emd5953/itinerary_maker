@@ -1,27 +1,25 @@
 # aSpot - Travel Itinerary Planning Application
 
-> *"I know a spot" - but now with enterprise-grade architecture* 😎
-
 ## Overview
 
 aSpot is a comprehensive travel itinerary planning application that helps users create, organize, and collaborate on travel plans. The system addresses the common problem of poorly planned trips by providing intelligent recommendations, scheduling tools, and collaborative features.
 
-## 🚀 Features
+## Features
 
-- **Smart Itinerary Creation** - AI-powered activity recommendations
-- **Collaborative Planning** - Share and edit itineraries with travel companions
-- **Activity Recommendations** - Discover attractions based on preferences and interests
-- **Map Integration** - Visualize routes and optimize travel logistics
-- **Schedule Management** - Organize activities by day and time with conflict detection
-- **Export Options** - Export to PDF and calendar applications
+- **Smart Itinerary Creation**: Generate structured travel plans with AI-powered recommendations
+- **Collaborative Planning**: Share and edit itineraries with travel companions
+- **Activity Recommendations**: Discover attractions based on preferences and interests
+- **Map Integration**: Visualize routes and optimize travel logistics
+- **Schedule Management**: Organize activities by day and time with conflict detection
+- **Export Options**: Export to PDF and calendar applications
 
-## 🏗️ Architecture
+## Architecture
 
 - **Frontend**: Next.js 15 with React 19, TypeScript, Tailwind CSS
 - **Backend**: Java 17 with Spring Boot 3.x, PostgreSQL, Redis, Elasticsearch
 - **Infrastructure**: Docker, Kubernetes (production)
 
-## 🛠️ Quick Start
+## Quick Start
 
 ### Prerequisites
 - Node.js 18+
@@ -59,7 +57,7 @@ aSpot is a comprehensive travel itinerary planning application that helps users 
    - Backend API: http://localhost:8080
    - API Health: http://localhost:8080/health
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 ├── docs/                   # Documentation
@@ -71,37 +69,20 @@ aSpot is a comprehensive travel itinerary planning application that helps users 
 └── scripts/               # Development scripts
 ```
 
-## 📚 Documentation
+## Development
 
-- [Complete Documentation](./docs/README.md)
-- [Frontend Documentation](./frontend/README.md)
-- [Backend Documentation](./backend/README.md)
-- [Docker Setup](./docker/README.md)
+See individual README files in each directory:
+- [Frontend Documentation](../frontend/README.md)
+- [Backend Documentation](../backend/README.md)
+- [Docker Setup](../docker/README.md)
 
-## 🎯 Development
+## Contributing
 
-This project follows **spec-driven development**:
-
-1. **Requirements**: [.kiro/specs/itinerary-planning/requirements.md](.kiro/specs/itinerary-planning/requirements.md)
-2. **Design**: [.kiro/specs/itinerary-planning/design.md](.kiro/specs/itinerary-planning/design.md)
-3. **Tasks**: [.kiro/specs/itinerary-planning/tasks.md](.kiro/specs/itinerary-planning/tasks.md)
-
-To start implementing:
-1. Open `.kiro/specs/itinerary-planning/tasks.md`
-2. Click "Start task" next to any task item
-3. Follow the systematic development approach
-
-## 🤝 Contributing
-
-1. Follow the spec-driven development process
+1. Follow the spec-driven development process in `.kiro/specs/`
 2. Use the task-based implementation approach
 3. Ensure all tests pass before submitting PRs
 4. Follow the established code organization patterns
 
-## 📄 License
+## License
 
 [Add your license here]
-
----
-
-**Happy Planning!** 🗺️✈️

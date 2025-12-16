@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Backend (Spring Boot/Maven)
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/application-local.yml
+backend/application-local.properties
+
+# Docker volumes
+postgres_data/
+redis_data/
+elasticsearch_data/
