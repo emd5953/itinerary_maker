@@ -1,52 +1,67 @@
+# aSpot - Travel Itinerary Planning Application
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+# Frontend (Next.js)
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.pnp
+frontend/.pnp.*
+frontend/.yarn/*
+!frontend/.yarn/patches
+!frontend/.yarn/plugins
+!frontend/.yarn/releases
+!frontend/.yarn/versions
+frontend/coverage/
+frontend/*.tsbuildinfo
+frontend/next-env.d.ts
 
-# testing
-/coverage
+# Backend (Spring Boot/Maven)
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/.mvn/wrapper/MavenWrapperDownloader.java
+backend/application-local.yml
+backend/application-local.properties
 
-# next.js
-/.next/
-/out/
+# Environment files
+.env*
+!.env.example
 
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.pem
 
-# vercel
+# IDE files
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Docker volumes and data
+postgres_data/
+postgres_dev_data/
+redis_data/
+redis_dev_data/
+elasticsearch_data/
+elasticsearch_dev_data/
+
+# Vercel
 .vercel
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# Backend (Spring Boot/Maven)
-backend/target/
-backend/.mvn/wrapper/maven-wrapper.jar
-backend/application-local.yml
-backend/application-local.properties
-
-# Docker volumes
-postgres_data/
-redis_data/
-elasticsearch_data/
+# Temporary files
+*.tmp
+*.temp
