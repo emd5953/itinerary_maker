@@ -70,10 +70,10 @@ spring:
   
   # Security Configuration
   security:
-    jwt:
-      secret: ${JWT_SECRET:mySecretKey}
-      expiration: ${JWT_EXPIRATION:86400000} # 24 hours
-      refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000} # 7 days
+    clerk:
+      publishable-key: ${CLERK_PUBLISHABLE_KEY:pk_test_your_key_here}
+      secret-key: ${CLERK_SECRET_KEY:sk_test_your_key_here}
+      jwks-url: ${CLERK_JWKS_URL:https://your-app.clerk.accounts.dev/.well-known/jwks.json}
 
 # Server Configuration
 server:

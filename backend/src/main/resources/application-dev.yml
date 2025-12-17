@@ -25,6 +25,13 @@ spring:
     elasticsearch:
       uris: http://localhost:9200
 
+  # Development Clerk Configuration
+  security:
+    clerk:
+      publishable-key: ${CLERK_PUBLISHABLE_KEY:pk_test_your_dev_key_here}
+      secret-key: ${CLERK_SECRET_KEY:sk_test_your_dev_key_here}
+      jwks-url: ${CLERK_JWKS_URL:https://your-app.clerk.accounts.dev/.well-known/jwks.json}
+
 # Development Logging
 logging:
   level:
