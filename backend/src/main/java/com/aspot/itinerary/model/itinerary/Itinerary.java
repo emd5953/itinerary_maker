@@ -2,6 +2,8 @@ package com.aspot.itinerary.model.itinerary;
 
 import com.aspot.itinerary.model.user.User;
 import com.aspot.itinerary.model.valueobject.ItinerarySettings;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -47,9 +49,11 @@ public class Itinerary {
         joinColumns = @JoinColumn(name = "itinerary_id"),
         inverseJoinColumns = @JoinColumn(name = "user_id")
     )
+    @JsonIgnore
     private List<User> collaborators = new ArrayList<>();
     
     @OneToMany(mappedBy = "itinerary", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<DayPlan> dayPlans = new ArrayList<>();
     
     @Embedded

@@ -30,8 +30,40 @@ public class UserService {
      */
     @Transactional
     public User getOrCreateUser(String clerkId) {
+        // Handle anonymous users for testing
+        if ("anonymous-user".equals(clerkId)) {
+            return createAnonymousUser();
+        }
+        
         return userRepository.findByClerkId(clerkId)
                 .orElseGet(() -> createUserFromClerk(clerkId));
+    }
+    
+    /**
+     * Creates an anonymous user for testing purposes
+     */
+    private User createAnonymousUser() {
+        log.info("Creating anonymous user for testing");
+        
+        User user = new User();
+        user.setClerkId("anonymous-user");
+        user.setEmail("test@example.com");
+        user.setName("Test User");
+        
+        // Set default preferences
+        UserPreferences preferences = new UserPreferences();
+        user.setPreferences(preferences);
+        
+        // Check if anonymous user already exists
+        Optional<User> existingUser = userRepository.findByClerkId("anonymous-user");
+        if (existingUser.isPresent()) {
+            return existingUser.get();
+        }
+        
+        User savedUser = userRepository.save(user);
+        log.info("Created anonymous user with ID: {}", savedUser.getId());
+        
+        return savedUser;
     }
     
     /**

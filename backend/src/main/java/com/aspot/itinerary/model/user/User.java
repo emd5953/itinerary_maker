@@ -1,6 +1,7 @@
 package com.aspot.itinerary.model.user;
 
 import com.aspot.itinerary.model.itinerary.Itinerary;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,6 +40,7 @@ public class User {
     private UserPreferences preferences;
     
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Itinerary> itineraries = new ArrayList<>();
     
     @CreationTimestamp

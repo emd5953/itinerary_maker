@@ -11,5 +11,6 @@ import java.util.UUID;
 @Repository
 public interface ItineraryRepository extends JpaRepository<Itinerary, UUID> {
     List<Itinerary> findByOwner(User owner);
+    List<Itinerary> findByOwnerOrderByCreatedAtDesc(User owner);
     List<Itinerary> findByDestinationContainingIgnoreCase(String destination);
 }

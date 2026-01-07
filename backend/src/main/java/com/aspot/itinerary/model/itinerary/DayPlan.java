@@ -1,5 +1,7 @@
 package com.aspot.itinerary.model.itinerary;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -21,10 +23,12 @@ public class DayPlan {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "itinerary_id")
+    @JsonBackReference
     private Itinerary itinerary;
     
     @OneToMany(mappedBy = "dayPlan", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("startTime ASC")
+    @JsonManagedReference
     private List<ScheduledActivity> activities = new ArrayList<>();
     
     @Column(columnDefinition = "TEXT")

@@ -2,6 +2,7 @@ package com.aspot.itinerary.model.itinerary;
 
 import com.aspot.itinerary.model.enums.ActivityCategory;
 import com.aspot.itinerary.model.valueobject.Location;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -55,5 +56,6 @@ public class ScheduledActivity {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "day_plan_id")
+    @JsonBackReference
     private DayPlan dayPlan;
 }
