@@ -12,7 +12,7 @@ import java.util.List;
 @Embeddable
 @Data
 public class UserPreferences {
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_interests", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "interest")
     private List<String> interests = new ArrayList<>(); // ["sights", "food", "outdoor", "nightlife"]
@@ -25,7 +25,7 @@ public class UserPreferences {
     @Column(name = "travel_style")
     private TravelStyle travelStyle = TravelStyle.RELAXED;
     
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_dietary_restrictions", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "restriction")
     private List<String> dietaryRestrictions = new ArrayList<>();

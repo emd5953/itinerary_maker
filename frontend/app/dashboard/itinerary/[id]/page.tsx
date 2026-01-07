@@ -11,56 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-
-interface ScheduledActivity {
-  id: string;
-  name: string;
-  description?: string;
-  category: string;
-  location: {
-    latitude: number;
-    longitude: number;
-    address: string;
-    city?: string;
-    country?: string;
-    placeId?: string;
-  };
-  startTime: string;
-  endTime: string;
-  estimatedDuration?: number;
-  websiteUrl?: string;
-  rating?: number;
-  priceRange?: string;
-  tags?: string[];
-}
-
-interface DayPlan {
-  id: string;
-  date: string;
-  activities: ScheduledActivity[];
-  notes?: string;
-}
-
-interface User {
-  id: string;
-  clerkId: string;
-  email: string;
-  name: string;
-  profilePicture?: string;
-}
-
-interface Itinerary {
-  id: string;
-  title: string;
-  destination: string;
-  startDate: string;
-  endDate: string;
-  owner: User;
-  dayPlans: DayPlan[];
-  settings?: any;
-  createdAt: string;
-  updatedAt: string;
-}
+import { apiService, type Itinerary, type ScheduledActivity } from '@/lib/api';
 
 export default function ItineraryPage() {
   const { isLoaded, isSignedIn } = useUser();
@@ -82,14 +33,7 @@ export default function ItineraryPage() {
     try {
       setLoading(true);
       
-      // Simplified API call without authentication
-      const response = await fetch(`http://localhost:8080/api/itineraries/${itineraryId}`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
+      const data = await apiService.getItinerary(itineraryId);
       setItinerary(data);
     } catch (error) {
       console.error('Error loading itinerary:', error);
@@ -106,14 +50,7 @@ export default function ItineraryPage() {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/api/itineraries/${itinerary.id}`, {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
+      await apiService.deleteItinerary(itinerary.id);
       toast.success('Itinerary deleted successfully');
       router.push('/dashboard');
     } catch (error) {

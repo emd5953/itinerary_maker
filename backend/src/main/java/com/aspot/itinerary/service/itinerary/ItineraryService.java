@@ -51,15 +51,15 @@ public class ItineraryService {
     /**
      * Get itinerary by ID
      */
-    @Cacheable(value = "itineraries", key = "#id")
+    // @Cacheable(value = "itineraries", key = "#id") // Temporarily disabled due to serialization issues
     public Optional<Itinerary> getItinerary(UUID id) {
-        return itineraryRepository.findById(id);
+        return itineraryRepository.findByIdWithDetails(id);
     }
     
     /**
      * Get all itineraries for a user
      */
-    @Cacheable(value = "user-itineraries", key = "#clerkId")
+    // @Cacheable(value = "user-itineraries", key = "#clerkId") // Temporarily disabled
     public List<Itinerary> getUserItineraries(String clerkId) {
         User user = userService.getOrCreateUser(clerkId);
         return itineraryRepository.findByOwnerOrderByCreatedAtDesc(user);
@@ -69,7 +69,7 @@ public class ItineraryService {
      * Update itinerary
      */
     @Transactional
-    @CacheEvict(value = {"itineraries", "user-itineraries"}, allEntries = true)
+    // @CacheEvict(value = {"itineraries", "user-itineraries"}, allEntries = true) // Temporarily disabled
     public Itinerary updateItinerary(UUID id, Itinerary updatedItinerary) {
         Itinerary existing = itineraryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Itinerary not found: " + id));
@@ -84,7 +84,7 @@ public class ItineraryService {
      * Delete itinerary
      */
     @Transactional
-    @CacheEvict(value = {"itineraries", "user-itineraries"}, allEntries = true)
+    // @CacheEvict(value = {"itineraries", "user-itineraries"}, allEntries = true) // Temporarily disabled
     public void deleteItinerary(UUID id, String clerkId) {
         Itinerary itinerary = itineraryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Itinerary not found: " + id));

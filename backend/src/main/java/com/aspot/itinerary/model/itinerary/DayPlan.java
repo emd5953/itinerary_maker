@@ -26,7 +26,7 @@ public class DayPlan {
     @JsonBackReference
     private Itinerary itinerary;
     
-    @OneToMany(mappedBy = "dayPlan", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "dayPlan", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @OrderBy("startTime ASC")
     @JsonManagedReference
     private List<ScheduledActivity> activities = new ArrayList<>();

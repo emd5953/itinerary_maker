@@ -39,7 +39,7 @@ public class Itinerary {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
     
@@ -52,7 +52,7 @@ public class Itinerary {
     @JsonIgnore
     private List<User> collaborators = new ArrayList<>();
     
-    @OneToMany(mappedBy = "itinerary", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "itinerary", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<DayPlan> dayPlans = new ArrayList<>();
     

@@ -43,8 +43,12 @@ public class ItineraryGenerationService {
         
         // Get recommended activities
         int activitiesNeeded = calculateActivitiesNeeded(numberOfDays, preferences.getTravelStyle());
+        log.info("Requesting {} activities for {} days trip", activitiesNeeded, numberOfDays);
+        
         List<Activity> recommendedActivities = recommendationService.generateRecommendations(
                 destination, preferences, activitiesNeeded);
+        
+        log.info("Received {} recommended activities from recommendation service", recommendedActivities.size());
         
         // Create itinerary
         Itinerary itinerary = new Itinerary();

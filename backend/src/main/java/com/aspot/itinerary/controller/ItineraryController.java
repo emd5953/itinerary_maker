@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -55,9 +57,32 @@ public class ItineraryController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<Itinerary> getItinerary(@PathVariable UUID id) {
-        return itineraryService.getItinerary(id)
-                .map(itinerary -> ResponseEntity.ok(itinerary))
-                .orElse(ResponseEntity.notFound().build());
+        try {
+            log.info("Fetching itinerary with ID: {}", id);
+            Optional<Itinerary> itineraryOpt = itineraryService.getItinerary(id);
+            
+            if (itineraryOpt.isPresent()) {
+                log.info("Found itinerary: {}", itineraryOpt.get().getTitle());
+                return ResponseEntity.ok(itineraryOpt.get());
+            } else {
+                log.warn("Itinerary not found with ID: {}", id);
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            log.error("Error fetching itinerary with ID {}: {}", id, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    /**
+     * Simple test endpoint
+     */
+    @GetMapping("/test")
+    public ResponseEntity<Map<String, Object>> testEndpoint() {
+        return ResponseEntity.ok(Map.of(
+            "message", "Itinerary service is working",
+            "timestamp", System.currentTimeMillis()
+        ));
     }
     
     /**

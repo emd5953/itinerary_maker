@@ -49,7 +49,7 @@ public class ScheduledActivity {
     @Column(name = "price_range")
     private String priceRange;
     
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "scheduled_activity_tags", joinColumns = @JoinColumn(name = "scheduled_activity_id"))
     @Column(name = "tag")
     private List<String> tags = new ArrayList<>();
