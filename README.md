@@ -17,9 +17,24 @@ aSpot is a comprehensive travel itinerary planning application that helps users 
 
 ## 🏗️ Architecture
 
-- **Frontend**: Next.js 15 with React 19, TypeScript, Tailwind CSS
-- **Backend**: Java 17 with Spring Boot 3.x, PostgreSQL, Redis, Elasticsearch
-- **Infrastructure**: Docker, Kubernetes (production)
+### Microservices Architecture
+- **API Gateway**: Spring Cloud Gateway (Port 8080) - Routing, circuit breakers, rate limiting
+- **User Service**: Spring Boot (Port 8081) - User management & authentication
+- **Itinerary Service**: Spring Boot (Port 8082) - Itinerary & day plan management
+- **Activity Service**: Spring Boot (Port 8083) - Activity search & recommendations
+- **Collaboration Service**: Spring Boot (Port 8084) - Real-time collaboration
+
+### Frontend
+- **Next.js 15** with React 19, TypeScript, Tailwind CSS
+
+### Databases (Database-per-Service Pattern)
+- **PostgreSQL** (3 instances) - User, Itinerary, Collaboration databases
+- **Elasticsearch** - Activity search and recommendations
+- **Redis** - Caching and rate limiting
+
+### Infrastructure
+- **Docker Compose** - Local development and testing
+- **Kubernetes** - Production deployment (ready)
 
 ## 🛠️ Quick Start
 
@@ -30,41 +45,48 @@ aSpot is a comprehensive travel itinerary planning application that helps users 
 
 ### Development Setup
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd itinerary_maker
-   ```
+#### Option 1: Full Microservices (Recommended)
 
-2. **Start infrastructure services**
-   ```bash
-   docker-compose -f docker/docker-compose.dev.yml up -d
-   ```
+```bash
+# Start all microservices with Docker Compose
+docker-compose -f docker/docker-compose.microservices.yml up -d
 
-3. **Start backend**
-   ```bash
-   cd backend
-   ./mvnw spring-boot:run
-   ```
+# Access the application
+# Frontend: http://localhost:3000
+# API Gateway: http://localhost:8080
+# Individual services: 8081-8084
+```
 
-4. **Start frontend**
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
+#### Option 2: Monolithic Backend (Legacy)
 
-5. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:8080
-   - API Health: http://localhost:8080/health
+```bash
+# Start infrastructure services
+docker-compose -f docker/docker-compose.dev.yml up -d
+
+# Start backend
+cd backend
+./mvnw spring-boot:run
+
+# Start frontend
+cd frontend
+npm install
+npm run dev
+```
+
+**See [MICROSERVICES_SUMMARY.md](MICROSERVICES_SUMMARY.md) for detailed microservices setup.**
 
 ## 📁 Project Structure
 
 ```
 ├── docs/                   # Documentation
+├── microservices/         # Microservices architecture
+│   ├── api-gateway/       # API Gateway (Spring Cloud Gateway)
+│   ├── user-service/      # User management service
+│   ├── itinerary-service/ # Itinerary management service
+│   ├── activity-service/  # Activity search service
+│   └── collaboration-service/ # Collaboration service
 ├── frontend/              # Next.js frontend application
-├── backend/               # Spring Boot backend application
+├── backend/               # Legacy monolithic backend (optional)
 ├── docker/                # Docker configuration files
 ├── config/                # Configuration files
 ├── .kiro/                 # Kiro IDE specifications
@@ -73,10 +95,17 @@ aSpot is a comprehensive travel itinerary planning application that helps users 
 
 ## 📚 Documentation
 
-- [Complete Documentation](./docs/README.md)
+### Microservices
+- **[Microservices Summary](./MICROSERVICES_SUMMARY.md)** - Quick overview
+- **[Microservices Setup Guide](./docs/MICROSERVICES_SETUP.md)** - Detailed setup
+- **[Microservices Architecture](./docs/MICROSERVICES_ARCHITECTURE.md)** - Architecture details
+- **[ReliaQuest Alignment](./docs/RELIQUEST_ALIGNMENT.md)** - Job interview prep
+
+### Components
 - [Frontend Documentation](./frontend/README.md)
-- [Backend Documentation](./backend/README.md)
+- [Backend Documentation](./backend/README.md) (Legacy monolith)
 - [Docker Setup](./docker/README.md)
+- [Complete Documentation](./docs/README.md)
 
 ## 🎯 Development
 

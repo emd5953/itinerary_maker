@@ -1,0 +1,273 @@
+version: '3.8'
+
+services:
+  # ==================== MICROSERVICES ====================
+  
+  # API Gateway
+  api-gateway:
+    build:
+      context: ../microservices/api-gateway
+      dockerfile: Dockerfile
+    container_name: aspot-api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_REDIS_HOST=redis
+      - USER_SERVICE_URL=http://user-service:8081
+      - ITINERARY_SERVICE_URL=http://itinerary-service:8082
+      - ACTIVITY_SERVICE_URL=http://activity-service:8083
+      - COLLABORATION_SERVICE_URL=http://collaboration-service:8084
+    depends_on:
+      - redis
+      - user-service
+      - itinerary-service
+      - activity-service
+      - collaboration-service
+    networks:
+      - aspot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  
+  # User Service
+  user-service:
+    build:
+      context: ../microservices/user-service
+      dockerfile: Dockerfile
+    container_name: aspot-user-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-user:5432/user_db
+      - SPRING_DATASOURCE_USERNAME=aspot_user
+      - SPRING_DATASOURCE_PASSWORD=aspot_user
+      - SPRING_REDIS_HOST=redis
+    depends_on:
+      postgres-user:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - aspot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  
+  # Itinerary Service
+  itinerary-service:
+    build:
+      context: ../microservices/itinerary-service
+      dockerfile: Dockerfile
+    container_name: aspot-itinerary-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-itinerary:5432/itinerary_db
+      - SPRING_DATASOURCE_USERNAME=aspot_itinerary
+      - SPRING_DATASOURCE_PASSWORD=aspot_itinerary
+      - SPRING_REDIS_HOST=redis
+      - USER_SERVICE_URL=http://user-service:8081
+      - ACTIVITY_SERVICE_URL=http://activity-service:8083
+    depends_on:
+      postgres-itinerary:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - aspot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  
+  # Activity Service
+  activity-service:
+    build:
+      context: ../microservices/activity-service
+      dockerfile: Dockerfile
+    container_name: aspot-activity-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
+      - SPRING_REDIS_HOST=redis
+      - USER_SERVICE_URL=http://user-service:8081
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - aspot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  
+  # Collaboration Service
+  collaboration-service:
+    build:
+      context: ../microservices/collaboration-service
+      dockerfile: Dockerfile
+    container_name: aspot-collaboration-service
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-collaboration:5432/collaboration_db
+      - SPRING_DATASOURCE_USERNAME=aspot_collab
+      - SPRING_DATASOURCE_PASSWORD=aspot_collab
+      - SPRING_REDIS_HOST=redis
+      - USER_SERVICE_URL=http://user-service:8081
+      - ITINERARY_SERVICE_URL=http://itinerary-service:8082
+    depends_on:
+      postgres-collaboration:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - aspot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  
+  # ==================== DATABASES ====================
+  
+  # PostgreSQL for User Service
+  postgres-user:
+    image: postgres:15-alpine
+    container_name: aspot-postgres-user
+    environment:
+      POSTGRES_DB: user_db
+      POSTGRES_USER: aspot_user
+      POSTGRES_PASSWORD: aspot_user
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_user_data:/var/lib/postgresql/data
+    networks:
+      - aspot-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aspot_user -d user_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  # PostgreSQL for Itinerary Service
+  postgres-itinerary:
+    image: postgres:15-alpine
+    container_name: aspot-postgres-itinerary
+    environment:
+      POSTGRES_DB: itinerary_db
+      POSTGRES_USER: aspot_itinerary
+      POSTGRES_PASSWORD: aspot_itinerary
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_itinerary_data:/var/lib/postgresql/data
+    networks:
+      - aspot-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aspot_itinerary -d itinerary_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  # PostgreSQL for Collaboration Service
+  postgres-collaboration:
+    image: postgres:15-alpine
+    container_name: aspot-postgres-collaboration
+    environment:
+      POSTGRES_DB: collaboration_db
+      POSTGRES_USER: aspot_collab
+      POSTGRES_PASSWORD: aspot_collab
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_collaboration_data:/var/lib/postgresql/data
+    networks:
+      - aspot-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aspot_collab -d collaboration_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  # ==================== INFRASTRUCTURE ====================
+  
+  # Redis (Shared)
+  redis:
+    image: redis:7-alpine
+    container_name: aspot-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - aspot-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  # Elasticsearch (Activity Service)
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: aspot-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - aspot-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  
+  # ==================== FRONTEND ====================
+  
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: ../docker/Dockerfile.frontend
+    container_name: aspot-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+    depends_on:
+      - api-gateway
+    networks:
+      - aspot-network
+
+volumes:
+  postgres_user_data:
+  postgres_itinerary_data:
+  postgres_collaboration_data:
+  redis_data:
+  elasticsearch_data:
+
+networks:
+  aspot-network:
+    driver: bridge
