@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { UserButton, useUser, RedirectToSignIn } from '@clerk/nextjs';
+import { UserButton, useUser, useAuth, RedirectToSignIn } from '@clerk/nextjs';
 import { ArrowLeft, Save, Heart, DollarSign, Clock, Utensils, Car } from 'lucide-react';
 import Link from 'next/link';
 import Logo from '../../components/Logo';
@@ -48,11 +48,12 @@ const TRANSPORT_OPTIONS = [
   { id: 'public_transport', label: 'Public Transport', icon: '🚇' },
   { id: 'car', label: 'Car/Taxi', icon: '�,' },
   { id: 'bike', label: 'Bike', icon: '�' },
-  { id: 'mixed', label: 'Mixed', icon: '🚌' },
+  { id: 'MIXED', label: 'Mixed', icon: '🚌' },
 ];
 
 export default function PreferencesPage() {
   const { isLoaded, isSignedIn } = useUser();
+  const { getToken } = useAuth();
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [preferences, setPreferences] = useState({
@@ -60,7 +61,7 @@ export default function PreferencesPage() {
     budgetLevel: 'MID_RANGE',
     travelStyle: 'MODERATE',
     dietaryRestrictions: [] as string[],
-    preferredTransport: 'mixed',
+    preferredTransport: 'MIXED',
   });
 
   useEffect(() => {
@@ -71,14 +72,15 @@ export default function PreferencesPage() {
 
   const loadUserPreferences = async () => {
     try {
-      const userPrefs = await apiService.getUserPreferences();
+      const token = await getToken();
+      const userPrefs = await apiService.getUserPreferences(token);
       if (userPrefs) {
         setPreferences({
           interests: userPrefs.interests || [],
           budgetLevel: userPrefs.budgetLevel || 'MID_RANGE',
           travelStyle: userPrefs.travelStyle || 'MODERATE',
           dietaryRestrictions: userPrefs.dietaryRestrictions || [],
-          preferredTransport: userPrefs.preferredTransport || 'mixed',
+          preferredTransport: userPrefs.preferredTransport || 'MIXED',
         });
       }
     } catch (error) {
@@ -122,7 +124,8 @@ export default function PreferencesPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await apiService.updateUserPreferences(preferences);
+      const token = await getToken();
+      await apiService.updateUserPreferences(preferences, token);
       toast.success('Preferences saved successfully!');
       router.push('/dashboard');
     } catch (error) {

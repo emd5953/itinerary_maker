@@ -40,8 +40,8 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // Temporarily allow all requests for testing
-                .anyRequest().permitAll()
+                .requestMatchers("/health", "/public/**", "/actuator/**", "/weather/**").permitAll()
+                .anyRequest().authenticated()
             )
             .addFilterBefore(clerkAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         
@@ -101,10 +101,11 @@ public class SecurityConfig {
         @Override
         protected boolean shouldNotFilter(HttpServletRequest request) {
             String path = request.getRequestURI();
-            return path.startsWith("/health") || 
-                   path.startsWith("/public") || 
-                   path.startsWith("/actuator") ||
-                   path.startsWith("/api/itineraries"); // Temporarily skip auth for itineraries
+            boolean shouldSkip = path.startsWith("/api/health") || 
+                   path.startsWith("/api/public") || 
+                   path.startsWith("/api/actuator") ||
+                   path.startsWith("/api/weather");
+            return shouldSkip;
         }
     }
 }

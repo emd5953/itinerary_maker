@@ -2,20 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { UserButton, useUser, RedirectToSignIn } from '@clerk/nextjs';
-import { ArrowLeft, MapPin, Calendar, Clock, Star, ExternalLink, Edit2, Trash2, Share2, Settings, Map, Download, List } from 'lucide-react';
+import { UserButton, useUser, useAuth, RedirectToSignIn } from '@clerk/nextjs';
+import { ArrowLeft, MapPin, Calendar, Clock, Star, ExternalLink, Trash2, Share2, Map, Download, List } from 'lucide-react';
 import Link from 'next/link';
 import Logo from '../../../components/Logo';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { apiService, type Itinerary, type ScheduledActivity, type WeatherForecast } from '@/lib/api';
 import DayPlanCard from '@/components/itinerary/DayPlanCard';
-import ItineraryMap from '@/components/itinerary/ItineraryMap';
+import GPSMap from '@/components/itinerary/GPSMap';
+import WeatherCard from '@/components/itinerary/WeatherCard';
+import LocationServices from '@/components/itinerary/LocationServices';
 
 const formatTime = (timeString: string) => {
   const date = new Date(`2000-01-01T${timeString}`);
@@ -36,54 +37,9 @@ const formatDate = (dateString: string) => {
   });
 };
 
-const ActivityCard = ({ activity }: { activity: ScheduledActivity }) => (
-  <Card className="mb-4">
-    <CardContent className="p-4">
-      <div className="flex justify-between items-start mb-3">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-medium text-lg">{activity.name}</h3>
-            {activity.rating && (
-              <Badge variant="secondary" className="gap-1">
-                <Star size={12} className="fill-current" />
-                {activity.rating}
-              </Badge>
-            )}
-          </div>
-          <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
-            <div className="flex items-center gap-1">
-              <Clock size={14} />
-              {formatTime(activity.startTime)} - {formatTime(activity.endTime)}
-            </div>
-            <div className="flex items-center gap-1">
-              <MapPin size={14} />
-              {activity.location.address}
-            </div>
-          </div>
-          {activity.description && (
-            <p className="text-sm text-muted-foreground mb-2">{activity.description}</p>
-          )}
-          <div className="flex items-center gap-2">
-            <Badge variant="outline">{activity.category}</Badge>
-            {activity.priceRange && (
-              <Badge variant="outline">{activity.priceRange}</Badge>
-            )}
-          </div>
-        </div>
-        {activity.websiteUrl && (
-          <Button variant="ghost" size="sm" asChild>
-            <a href={activity.websiteUrl} target="_blank" rel="noopener noreferrer">
-              <ExternalLink size={16} />
-            </a>
-          </Button>
-        )}
-      </div>
-    </CardContent>
-  </Card>
-);
-
 export default function ItineraryPage() {
   const { isLoaded, isSignedIn } = useUser();
+  const { getToken } = useAuth();
   const params = useParams();
   const router = useRouter();
   const [itinerary, setItinerary] = useState<Itinerary | null>(null);
@@ -93,6 +49,7 @@ export default function ItineraryPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [showWeather, setShowWeather] = useState(true);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [selectedMapDay, setSelectedMapDay] = useState(1);
 
   const itineraryId = params.id as string;
 
@@ -106,22 +63,25 @@ export default function ItineraryPage() {
     try {
       setLoading(true);
       
-      const data = await apiService.getItinerary(itineraryId);
+      const token = await getToken();
+      const data = await apiService.getItinerary(itineraryId, token);
       setItinerary(data);
 
       // Load weather forecast
-      if (showWeather) {
-        try {
-          const weatherData = await apiService.getWeatherForecast(
-            data.destination,
-            data.startDate,
-            data.endDate
-          );
-          setWeather(weatherData);
-        } catch (weatherError) {
-          console.warn('Weather data unavailable:', weatherError);
-        }
+      try {
+        console.log('🌤️ Loading weather for:', data.destination, 'from', data.startDate, 'to', data.endDate);
+        const weatherData = await apiService.getWeatherForecast(
+          data.destination,
+          data.startDate,
+          data.endDate
+        );
+        console.log('🌤️ Weather data received:', weatherData);
+        setWeather(weatherData);
+      } catch (weatherError) {
+        console.error('🌤️ Weather API error:', weatherError);
+        // Don't fail the whole page if weather fails
       }
+
     } catch (error) {
       console.error('Error loading itinerary:', error);
       setError('Failed to load itinerary');
@@ -137,7 +97,8 @@ export default function ItineraryPage() {
     }
 
     try {
-      await apiService.deleteItinerary(itinerary.id);
+      const token = await getToken();
+      await apiService.deleteItinerary(itinerary.id, token);
       toast.success('Itinerary deleted successfully');
       router.push('/dashboard');
     } catch (error) {
@@ -155,8 +116,9 @@ export default function ItineraryPage() {
     if (!confirm('Remove this activity from your itinerary?')) return;
 
     try {
-      await apiService.removeActivity(itinerary!.id, dayPlanId, activityId);
-      await loadItinerary(); // Reload to get updated data
+      const token = await getToken();
+      const updatedItinerary = await apiService.removeActivity(itinerary!.id, dayPlanId, activityId, token);
+      setItinerary(updatedItinerary);
       toast.success('Activity removed');
     } catch (error) {
       console.error('Error removing activity:', error);
@@ -166,11 +128,12 @@ export default function ItineraryPage() {
 
   const handleActivityTimeChange = async (dayPlanId: string, activityId: string, startTime: string, endTime: string) => {
     try {
-      await apiService.updateActivity(itinerary!.id, dayPlanId, activityId, {
+      const token = await getToken();
+      const updatedItinerary = await apiService.updateActivity(itinerary!.id, dayPlanId, activityId, {
         startTime,
         endTime
-      });
-      await loadItinerary(); // Reload to get updated data
+      }, token);
+      setItinerary(updatedItinerary);
       toast.success('Activity time updated');
     } catch (error) {
       console.error('Error updating activity time:', error);
@@ -180,8 +143,9 @@ export default function ItineraryPage() {
 
   const handleActivityReorder = async (dayPlanId: string, activityIds: string[]) => {
     try {
-      await apiService.reorderActivities(itinerary!.id, dayPlanId, activityIds);
-      await loadItinerary(); // Reload to get updated data
+      const token = await getToken();
+      const updatedItinerary = await apiService.reorderActivities(itinerary!.id, dayPlanId, activityIds, token);
+      setItinerary(updatedItinerary);
       toast.success('Activities reordered');
     } catch (error) {
       console.error('Error reordering activities:', error);
@@ -293,7 +257,7 @@ export default function ItineraryPage() {
               <Button variant="ghost" size="icon">
                 <Download size={18} />
               </Button>
-              <UserButton afterSignOutUrl="/" />
+              <UserButton />
             </div>
           </div>
         </div>
@@ -345,14 +309,25 @@ export default function ItineraryPage() {
                 id="show-weather"
                 checked={showWeather}
                 onCheckedChange={(checked) => {
+                  console.log('🌤️ Weather toggle changed to:', checked);
                   setShowWeather(checked);
-                  if (checked) loadItinerary();
+                  if (checked) {
+                    console.log('🌤️ Loading weather data...');
+                    loadItinerary();
+                  }
                 }}
               />
               <Label htmlFor="show-weather">Show weather</Label>
             </div>
           </div>
         </div>
+
+        {/* Weather Forecast */}
+        {showWeather && weather.length > 0 && (
+          <div className="mb-6">
+            <WeatherCard weather={weather} destination={itinerary.destination} />
+          </div>
+        )}
 
         {/* Day Plans */}
         {viewMode === 'list' ? (
@@ -373,12 +348,29 @@ export default function ItineraryPage() {
             ))}
           </div>
         ) : (
-          <ItineraryMap
-            dayPlans={itinerary.dayPlans}
-            onActivitySelect={(activity) => {
-              toast.info(`Selected: ${activity.name}`);
-            }}
-          />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <GPSMap
+                dayPlans={itinerary.dayPlans}
+                selectedDay={selectedMapDay}
+                onDaySelect={(day) => {
+                  setSelectedMapDay(day);
+                }}
+                onActivitySelect={(activity) => {
+                  toast.info(`Selected: ${activity.name}`);
+                }}
+              />
+            </div>
+            <div className="space-y-4">
+              <LocationServices 
+                activities={itinerary.dayPlans.flatMap(day => day.activities)}
+                destination={itinerary.destination}
+              />
+              {showWeather && weather.length > 0 && (
+                <WeatherCard weather={weather} destination={itinerary.destination} />
+              )}
+            </div>
+          </div>
         )}
 
         {/* Trip Summary */}

@@ -11,7 +11,8 @@ aSpot is a comprehensive travel itinerary planning application that helps users 
 - **Smart Itinerary Creation** - AI-powered activity recommendations
 - **Collaborative Planning** - Share and edit itineraries with travel companions
 - **Activity Recommendations** - Discover attractions based on preferences and interests
-- **Map Integration** - Visualize routes and optimize travel logistics
+- **GPS Map Integration** - Real-time location tracking and interactive maps
+- **Route Optimization** - Multi-stop route planning with turn-by-turn navigation
 - **Schedule Management** - Organize activities by day and time with conflict detection
 - **Export Options** - Export to PDF and calendar applications
 
@@ -102,6 +103,7 @@ npm run dev
 
 ### Components
 - [Frontend Documentation](./frontend/README.md)
+- [GPS Setup Guide](./docs/GPS_SETUP.md) - Configure Google Maps integration
 - [Backend Documentation](./backend/README.md) (Legacy monolith)
 - [Docker Setup](./docker/README.md)
 - [Complete Documentation](./docs/README.md)

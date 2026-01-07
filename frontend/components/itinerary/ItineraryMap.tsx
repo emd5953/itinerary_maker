@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { MapPin, Navigation, Clock } from 'lucide-react';
+import { MapPin, Navigation, Clock, Locate, Route, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 import { DayPlan, ScheduledActivity } from '@/lib/api';
 
 interface ItineraryMapProps {
@@ -48,6 +49,54 @@ export default function ItineraryMap({
   const getDirectionsUrl = (activity: ScheduledActivity) => {
     const { latitude, longitude } = activity.location;
     return `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+  };
+
+  const getMultiStopDirectionsUrl = (activities: ScheduledActivity[]) => {
+    if (activities.length === 0) return '';
+    
+    const waypoints = activities.slice(1, -1).map(activity => 
+      `${activity.location.latitude},${activity.location.longitude}`
+    ).join('|');
+    
+    const origin = `${activities[0].location.latitude},${activities[0].location.longitude}`;
+    const destination = `${activities[activities.length - 1].location.latitude},${activities[activities.length - 1].location.longitude}`;
+    
+    let url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}`;
+    if (waypoints) {
+      url += `&waypoints=${waypoints}`;
+    }
+    return url;
+  };
+
+  const openInGoogleMaps = () => {
+    if (!currentDayPlan?.activities.length) return;
+    
+    if (currentDayPlan.activities.length === 1) {
+      window.open(getDirectionsUrl(currentDayPlan.activities[0]), '_blank');
+    } else {
+      window.open(getMultiStopDirectionsUrl(currentDayPlan.activities), '_blank');
+    }
+  };
+
+  const getCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          if (currentDayPlan?.activities.length) {
+            const firstActivity = currentDayPlan.activities[0];
+            const url = `https://www.google.com/maps/dir/${latitude},${longitude}/${firstActivity.location.latitude},${firstActivity.location.longitude}`;
+            window.open(url, '_blank');
+          }
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          toast.error('Could not get your current location');
+        }
+      );
+    } else {
+      toast.error('Geolocation is not supported by this browser');
+    }
   };
 
   return (
@@ -109,20 +158,29 @@ export default function ItineraryMap({
               </div>
             </div>
             
-            <div className="mt-4 text-center">
+            <div className="mt-4 flex flex-col gap-2">
               <p className="text-sm text-muted-foreground mb-2">
                 Click markers to view activity details
               </p>
-              <Button variant="outline" size="sm" asChild>
-                <a 
-                  href={`https://www.google.com/maps/search/${encodeURIComponent(dayPlans[0]?.activities[0]?.location.address || 'New York')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Navigation className="w-4 h-4 mr-2" />
-                  Open in Google Maps
-                </a>
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" onClick={openInGoogleMaps}>
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Open Full Route
+                </Button>
+                <Button variant="outline" size="sm" onClick={getCurrentLocation}>
+                  <Locate className="w-4 h-4 mr-2" />
+                  Navigate from Here
+                </Button>
+                {currentDayPlan?.activities.length > 1 && (
+                  <Button variant="outline" size="sm" onClick={() => {
+                    const url = getMultiStopDirectionsUrl(currentDayPlan.activities);
+                    window.open(url, '_blank');
+                  }}>
+                    <Route className="w-4 h-4 mr-2" />
+                    Multi-Stop Route
+                  </Button>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>

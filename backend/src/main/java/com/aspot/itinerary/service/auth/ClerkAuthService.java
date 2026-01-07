@@ -82,6 +82,8 @@ public class ClerkAuthService {
      */
     public ClerkUser getUserInfo(String userId) {
         try {
+            log.info("Fetching user info from Clerk for user ID: {}", userId);
+            
             String response = webClient.get()
                     .uri("https://api.clerk.com/v1/users/" + userId)
                     .header("Authorization", "Bearer " + clerkConfig.getSecretKey())
@@ -89,18 +91,26 @@ public class ClerkAuthService {
                     .bodyToMono(String.class)
                     .block();
             
+            log.info("Clerk API response for user {}: {}", userId, response);
+            
             JsonNode userNode = objectMapper.readTree(response);
             
-            return ClerkUser.builder()
+            ClerkUser clerkUser = ClerkUser.builder()
                     .id(userNode.get("id").asText())
                     .email(getEmailFromNode(userNode))
                     .firstName(userNode.path("first_name").asText())
                     .lastName(userNode.path("last_name").asText())
                     .imageUrl(userNode.path("image_url").asText())
                     .build();
+            
+            log.info("Created ClerkUser: id={}, email={}, firstName={}, lastName={}, fullName={}", 
+                    clerkUser.getId(), clerkUser.getEmail(), clerkUser.getFirstName(), 
+                    clerkUser.getLastName(), clerkUser.getFullName());
+                    
+            return clerkUser;
                     
         } catch (Exception e) {
-            log.error("Failed to fetch user info for user {}: {}", userId, e.getMessage());
+            log.error("Failed to fetch user info for user {}: {}", userId, e.getMessage(), e);
             throw new RuntimeException("Failed to fetch user info", e);
         }
     }

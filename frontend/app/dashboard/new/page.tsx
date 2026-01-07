@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { UserButton, useUser, RedirectToSignIn } from '@clerk/nextjs';
+import { UserButton, useUser, useAuth, RedirectToSignIn } from '@clerk/nextjs';
 import { ArrowLeft, MapPin, Calendar, Loader2, Settings, Heart, DollarSign, Clock } from 'lucide-react';
 import Link from 'next/link';
 import Logo from '../../components/Logo';
@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 
 export default function NewTrip() {
   const { isLoaded, isSignedIn, user } = useUser();
+  const { getToken } = useAuth();
   const router = useRouter();
   const [isGenerating, setIsGenerating] = useState(false);
   const [userPreferences, setUserPreferences] = useState<any>(null);
@@ -33,7 +34,8 @@ export default function NewTrip() {
 
   const loadUserPreferences = async () => {
     try {
-      const preferences = await apiService.getUserPreferences();
+      const token = await getToken();
+      const preferences = await apiService.getUserPreferences(token);
       setUserPreferences(preferences);
     } catch (error) {
       console.warn('Could not load user preferences:', error);
@@ -71,25 +73,12 @@ export default function NewTrip() {
     setIsGenerating(true);
 
     try {
-      // Simplified API call without authentication for now
-      const response = await fetch('http://localhost:8080/api/itineraries/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          destination: formData.destination,
-          startDate: formData.startDate,
-          endDate: formData.endDate,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const itinerary = await response.json();
-      console.log('Generated itinerary:', itinerary);
+      const token = await getToken();
+      const itinerary = await apiService.generateItinerary({
+        destination: formData.destination,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+      }, token);
       
       toast.success('Itinerary generated successfully!');
       router.push(`/dashboard/itinerary/${itinerary.id}`);

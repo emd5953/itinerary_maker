@@ -13,13 +13,24 @@ public class ClerkUser {
     private String imageUrl;
     
     public String getFullName() {
-        if (firstName != null && lastName != null) {
-            return firstName + " " + lastName;
-        } else if (firstName != null) {
-            return firstName;
-        } else if (lastName != null) {
-            return lastName;
+        StringBuilder fullName = new StringBuilder();
+        
+        if (firstName != null && !firstName.trim().isEmpty() && !"null".equals(firstName)) {
+            fullName.append(firstName.trim());
         }
-        return email; // Fallback to email
+        
+        if (lastName != null && !lastName.trim().isEmpty() && !"null".equals(lastName)) {
+            if (fullName.length() > 0) {
+                fullName.append(" ");
+            }
+            fullName.append(lastName.trim());
+        }
+        
+        if (fullName.length() > 0) {
+            return fullName.toString();
+        }
+        
+        // Fallback to email if no name is available
+        return email != null ? email : "User";
     }
 }

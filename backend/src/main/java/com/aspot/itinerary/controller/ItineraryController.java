@@ -32,8 +32,7 @@ public class ItineraryController {
             @Valid @RequestBody GenerateItineraryRequest request,
             Authentication authentication) {
         
-        // For testing purposes, allow anonymous users
-        String clerkId = authentication != null ? authentication.getName() : "anonymous-user";
+        String clerkId = authentication.getName();
         log.info("Generating itinerary for user: {} to destination: {}", clerkId, request.destination);
         
         try {
@@ -153,6 +152,94 @@ public class ItineraryController {
     }
     
     /**
+     * Update a specific activity in an itinerary
+     */
+    @PutMapping("/{itineraryId}/days/{dayPlanId}/activities/{activityId}")
+    public ResponseEntity<Itinerary> updateActivity(
+            @PathVariable UUID itineraryId,
+            @PathVariable UUID dayPlanId,
+            @PathVariable UUID activityId,
+            @Valid @RequestBody UpdateActivityRequest request,
+            Authentication authentication) {
+        
+        try {
+            String clerkId = authentication.getName();
+            
+            Itinerary updatedItinerary = itineraryService.updateActivity(
+                    itineraryId, dayPlanId, activityId, request, clerkId);
+            
+            return ResponseEntity.ok(updatedItinerary);
+            
+        } catch (IllegalArgumentException e) {
+            log.warn("Activity update failed: {}", e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (Exception e) {
+            log.error("Error updating activity: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    /**
+     * Remove an activity from an itinerary
+     */
+    @DeleteMapping("/{itineraryId}/days/{dayPlanId}/activities/{activityId}")
+    public ResponseEntity<Itinerary> removeActivity(
+            @PathVariable UUID itineraryId,
+            @PathVariable UUID dayPlanId,
+            @PathVariable UUID activityId,
+            Authentication authentication) {
+        
+        try {
+            String clerkId = authentication.getName();
+            
+            Itinerary updatedItinerary = itineraryService.removeActivity(
+                    itineraryId, dayPlanId, activityId, clerkId);
+            
+            return ResponseEntity.ok(updatedItinerary);
+            
+        } catch (IllegalArgumentException e) {
+            log.warn("Activity removal failed: {}", e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (Exception e) {
+            log.error("Error removing activity: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    /**
+     * Reorder activities within a day plan
+     */
+    @PutMapping("/{itineraryId}/days/{dayPlanId}/reorder")
+    public ResponseEntity<Itinerary> reorderActivities(
+            @PathVariable UUID itineraryId,
+            @PathVariable UUID dayPlanId,
+            @Valid @RequestBody ReorderActivitiesRequest request,
+            Authentication authentication) {
+        
+        try {
+            String clerkId = authentication.getName();
+            
+            Itinerary updatedItinerary = itineraryService.reorderActivities(
+                    itineraryId, dayPlanId, request.activityIds, clerkId);
+            
+            return ResponseEntity.ok(updatedItinerary);
+            
+        } catch (IllegalArgumentException e) {
+            log.warn("Activity reordering failed: {}", e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (Exception e) {
+            log.error("Error reordering activities: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    /**
      * Request DTO for generating itinerary
      */
     public static class GenerateItineraryRequest {
@@ -166,5 +253,24 @@ public class ItineraryController {
      */
     public static class UpdateItineraryRequest {
         public String title;
+    }
+    
+    /**
+     * Request DTO for updating activity
+     */
+    public static class UpdateActivityRequest {
+        public String name;
+        public String description;
+        public String startTime; // HH:mm:ss format
+        public String endTime;   // HH:mm:ss format
+        public String websiteUrl;
+        public String priceRange;
+    }
+    
+    /**
+     * Request DTO for reordering activities
+     */
+    public static class ReorderActivitiesRequest {
+        public List<UUID> activityIds;
     }
 }

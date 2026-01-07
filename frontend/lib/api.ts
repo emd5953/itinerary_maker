@@ -180,31 +180,31 @@ class ApiService {
 
   // User preferences
   async getUserPreferences(token?: string | null): Promise<User['preferences']> {
-    return this.request('/user/preferences/test', {}, token);
+    return this.request('/user/preferences', {}, token);
   }
 
   async updateUserPreferences(preferences: User['preferences'], token?: string | null): Promise<User['preferences']> {
-    return this.request('/user/preferences/test', {
+    return this.request('/user/preferences', {
       method: 'PUT',
       body: JSON.stringify(preferences),
     }, token);
   }
 
   // Activity management
-  async updateActivity(itineraryId: string, dayPlanId: string, activityId: string, updates: Partial<ScheduledActivity>, token?: string | null): Promise<ScheduledActivity> {
+  async updateActivity(itineraryId: string, dayPlanId: string, activityId: string, updates: Partial<ScheduledActivity>, token?: string | null): Promise<Itinerary> {
     return this.request(`/itineraries/${itineraryId}/days/${dayPlanId}/activities/${activityId}`, {
       method: 'PUT',
       body: JSON.stringify(updates),
     }, token);
   }
 
-  async removeActivity(itineraryId: string, dayPlanId: string, activityId: string, token?: string | null): Promise<void> {
+  async removeActivity(itineraryId: string, dayPlanId: string, activityId: string, token?: string | null): Promise<Itinerary> {
     return this.request(`/itineraries/${itineraryId}/days/${dayPlanId}/activities/${activityId}`, {
       method: 'DELETE',
     }, token);
   }
 
-  async reorderActivities(itineraryId: string, dayPlanId: string, activityIds: string[], token?: string | null): Promise<DayPlan> {
+  async reorderActivities(itineraryId: string, dayPlanId: string, activityIds: string[], token?: string | null): Promise<Itinerary> {
     return this.request(`/itineraries/${itineraryId}/days/${dayPlanId}/reorder`, {
       method: 'PUT',
       body: JSON.stringify({ activityIds }),

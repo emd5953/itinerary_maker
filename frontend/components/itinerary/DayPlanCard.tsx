@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar, Plus, Cloud, Sun, CloudRain, Snow } from 'lucide-react';
+import { Calendar, Plus, Cloud, Sun, CloudRain, Snowflake } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -46,7 +46,7 @@ export default function DayPlanCard({
       'clear': <Sun className="w-4 h-4 text-yellow-500" />,
       'cloudy': <Cloud className="w-4 h-4 text-gray-500" />,
       'rain': <CloudRain className="w-4 h-4 text-blue-500" />,
-      'snow': <Snow className="w-4 h-4 text-blue-200" />,
+      'snow': <Snowflake className="w-4 h-4 text-blue-200" />,
     };
     return icons[condition.toLowerCase()] || <Cloud className="w-4 h-4 text-gray-500" />;
   };
