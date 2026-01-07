@@ -34,9 +34,11 @@ export default function Dashboard() {
           <div className="flex justify-between items-center h-16">
             <Logo size="sm" />
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon">
-                <Settings size={18} />
-              </Button>
+              <Link href="/dashboard/preferences">
+                <Button variant="ghost" size="icon">
+                  <Settings size={18} />
+                </Button>
+              </Link>
               <UserButton afterSignOutUrl="/" />
             </div>
           </div>

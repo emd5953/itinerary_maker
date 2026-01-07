@@ -2,6 +2,8 @@ package com.aspot.itinerary.model.enums;
 
 public enum PreferredTransport {
     WALKING,
-    PUBLIC,
-    RIDESHARE
+    PUBLIC_TRANSPORT,
+    CAR,
+    BIKE,
+    MIXED
 }

@@ -23,7 +23,7 @@ public class UserPreferences {
     
     @Enumerated(EnumType.STRING)
     @Column(name = "travel_style")
-    private TravelStyle travelStyle = TravelStyle.RELAXED;
+    private TravelStyle travelStyle = TravelStyle.MODERATE;
     
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_dietary_restrictions", joinColumns = @JoinColumn(name = "user_id"))
@@ -32,5 +32,5 @@ public class UserPreferences {
     
     @Enumerated(EnumType.STRING)
     @Column(name = "preferred_transport")
-    private PreferredTransport preferredTransport = PreferredTransport.PUBLIC;
+    private PreferredTransport preferredTransport = PreferredTransport.MIXED;
 }

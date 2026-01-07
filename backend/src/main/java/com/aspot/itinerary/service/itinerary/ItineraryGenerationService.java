@@ -227,7 +227,7 @@ public class ItineraryGenerationService {
                 timeSlots.add(new TimeSlot(LocalTime.of(14, 0), LocalTime.of(17, 0), "afternoon"));
                 timeSlots.add(new TimeSlot(LocalTime.of(19, 0), LocalTime.of(21, 0), "evening"));
             }
-            case ADVENTURE -> {
+            case MODERATE -> {
                 timeSlots.add(new TimeSlot(LocalTime.of(9, 0), LocalTime.of(11, 30), "morning"));
                 timeSlots.add(new TimeSlot(LocalTime.of(13, 0), LocalTime.of(16, 0), "afternoon"));
                 timeSlots.add(new TimeSlot(LocalTime.of(17, 30), LocalTime.of(19, 30), "late_afternoon"));
@@ -259,7 +259,7 @@ public class ItineraryGenerationService {
     private int getActivitiesPerDay(TravelStyle travelStyle) {
         return switch (travelStyle) {
             case RELAXED -> 3;
-            case ADVENTURE -> 4;
+            case MODERATE -> 4;
             case PACKED -> 5;
         };
     }
@@ -270,7 +270,7 @@ public class ItineraryGenerationService {
     private UserPreferences createDefaultPreferences() {
         UserPreferences preferences = new UserPreferences();
         preferences.setInterests(Arrays.asList("sights", "food", "culture"));
-        preferences.setTravelStyle(TravelStyle.ADVENTURE);
+        preferences.setTravelStyle(TravelStyle.MODERATE);
         return preferences;
     }
     

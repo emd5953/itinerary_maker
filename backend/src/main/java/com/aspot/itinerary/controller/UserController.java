@@ -36,6 +36,45 @@ public class UserController {
     }
     
     /**
+     * Get current user's preferences (test endpoint)
+     */
+    @GetMapping("/preferences/test")
+    public ResponseEntity<UserProfileResponse.UserPreferencesDto> getUserPreferencesTest() {
+        // Create a test user for demonstration
+        User testUser = userService.getOrCreateUser("anonymous-user");
+        UserProfileResponse.UserPreferencesDto preferences = userMapper.toUserPreferencesDto(testUser.getPreferences());
+        return ResponseEntity.ok(preferences);
+    }
+    
+    /**
+     * Get current user's preferences
+     */
+    @GetMapping("/preferences")
+    public ResponseEntity<UserProfileResponse.UserPreferencesDto> getUserPreferences() {
+        User user = authenticationService.getCurrentUser();
+        UserProfileResponse.UserPreferencesDto preferences = userMapper.toUserPreferencesDto(user.getPreferences());
+        return ResponseEntity.ok(preferences);
+    }
+    
+    /**
+     * Update user preferences (test endpoint)
+     */
+    @PutMapping("/preferences/test")
+    public ResponseEntity<UserProfileResponse.UserPreferencesDto> updatePreferencesTest(
+            @Valid @RequestBody UpdateUserPreferencesRequest request) {
+        
+        // Create/get test user
+        User testUser = userService.getOrCreateUser("anonymous-user");
+        UserPreferences preferences = userMapper.toUserPreferences(request);
+        
+        User updatedUser = userService.updateUserPreferences("anonymous-user", preferences);
+        UserProfileResponse.UserPreferencesDto response = userMapper.toUserPreferencesDto(updatedUser.getPreferences());
+        
+        log.info("Updated preferences for test user: {}", updatedUser.getEmail());
+        return ResponseEntity.ok(response);
+    }
+    
+    /**
      * Update user preferences
      */
     @PutMapping("/preferences")

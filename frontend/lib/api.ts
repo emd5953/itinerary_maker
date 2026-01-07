@@ -74,6 +74,32 @@ export interface Itinerary {
   updatedAt: string;
 }
 
+export interface WeatherForecast {
+  date: string;
+  temperature: {
+    min: number;
+    max: number;
+  };
+  condition: string;
+  description: string;
+  humidity: number;
+  windSpeed: number;
+  icon: string;
+}
+
+export interface TravelTimeResult {
+  duration: number; // minutes
+  distance: number; // meters
+  mode: string;
+  route?: {
+    steps: Array<{
+      instruction: string;
+      duration: number;
+      distance: number;
+    }>;
+  };
+}
+
 class ApiService {
   private async getAuthHeaders(token?: string | null): Promise<HeadersInit> {
     return {
@@ -150,6 +176,52 @@ class ApiService {
   // Get itineraries by destination (no auth required)
   async getItinerariesByDestination(destination: string, limit = 20): Promise<Itinerary[]> {
     return this.request(`/itineraries/destination/${encodeURIComponent(destination)}?limit=${limit}`);
+  }
+
+  // User preferences
+  async getUserPreferences(token?: string | null): Promise<User['preferences']> {
+    return this.request('/user/preferences/test', {}, token);
+  }
+
+  async updateUserPreferences(preferences: User['preferences'], token?: string | null): Promise<User['preferences']> {
+    return this.request('/user/preferences/test', {
+      method: 'PUT',
+      body: JSON.stringify(preferences),
+    }, token);
+  }
+
+  // Activity management
+  async updateActivity(itineraryId: string, dayPlanId: string, activityId: string, updates: Partial<ScheduledActivity>, token?: string | null): Promise<ScheduledActivity> {
+    return this.request(`/itineraries/${itineraryId}/days/${dayPlanId}/activities/${activityId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates),
+    }, token);
+  }
+
+  async removeActivity(itineraryId: string, dayPlanId: string, activityId: string, token?: string | null): Promise<void> {
+    return this.request(`/itineraries/${itineraryId}/days/${dayPlanId}/activities/${activityId}`, {
+      method: 'DELETE',
+    }, token);
+  }
+
+  async reorderActivities(itineraryId: string, dayPlanId: string, activityIds: string[], token?: string | null): Promise<DayPlan> {
+    return this.request(`/itineraries/${itineraryId}/days/${dayPlanId}/reorder`, {
+      method: 'PUT',
+      body: JSON.stringify({ activityIds }),
+    }, token);
+  }
+
+  // Weather API
+  async getWeatherForecast(destination: string, startDate: string, endDate: string): Promise<WeatherForecast[]> {
+    return this.request(`/weather/forecast?destination=${encodeURIComponent(destination)}&startDate=${startDate}&endDate=${endDate}`);
+  }
+
+  // Travel time calculation
+  async getTravelTime(origin: { lat: number; lng: number }, destination: { lat: number; lng: number }, mode: 'walking' | 'driving' | 'transit' = 'walking'): Promise<TravelTimeResult> {
+    return this.request('/travel/time', {
+      method: 'POST',
+      body: JSON.stringify({ origin, destination, mode }),
+    });
   }
 }
 
