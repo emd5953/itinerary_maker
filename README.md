@@ -1,12 +1,12 @@
 # aSpot - Travel Itinerary Planning Application
 
-> *"I know a spot" - but now with enterprise-grade architecture* 😎
+> *"yo chat- I know a spot"* 
 
 ## Overview
 
 aSpot is a comprehensive travel itinerary planning application that helps users create, organize, and collaborate on travel plans. The system addresses the common problem of poorly planned trips by providing intelligent recommendations, scheduling tools, and collaborative features.
 
-## 🚀 Features
+##  Features
 
 - **Smart Itinerary Creation** - AI-powered activity recommendations
 - **Collaborative Planning** - Share and edit itineraries with travel companions
@@ -15,7 +15,7 @@ aSpot is a comprehensive travel itinerary planning application that helps users 
 - **Schedule Management** - Organize activities by day and time with conflict detection
 - **Export Options** - Export to PDF and calendar applications
 
-## 🏗️ Architecture
+##  Architecture
 
 ### Microservices Architecture
 - **API Gateway**: Spring Cloud Gateway (Port 8080) - Routing, circuit breakers, rate limiting
@@ -73,7 +73,6 @@ npm install
 npm run dev
 ```
 
-**See [MICROSERVICES_SUMMARY.md](MICROSERVICES_SUMMARY.md) for detailed microservices setup.**
 
 ## 📁 Project Structure
 
@@ -93,7 +92,7 @@ npm run dev
 └── scripts/               # Development scripts
 ```
 
-## 📚 Documentation
+##  Documentation
 
 ### Microservices
 - **[Microservices Summary](./MICROSERVICES_SUMMARY.md)** - Quick overview
@@ -107,30 +106,3 @@ npm run dev
 - [Docker Setup](./docker/README.md)
 - [Complete Documentation](./docs/README.md)
 
-## 🎯 Development
-
-This project follows **spec-driven development**:
-
-1. **Requirements**: [.kiro/specs/itinerary-planning/requirements.md](.kiro/specs/itinerary-planning/requirements.md)
-2. **Design**: [.kiro/specs/itinerary-planning/design.md](.kiro/specs/itinerary-planning/design.md)
-3. **Tasks**: [.kiro/specs/itinerary-planning/tasks.md](.kiro/specs/itinerary-planning/tasks.md)
-
-To start implementing:
-1. Open `.kiro/specs/itinerary-planning/tasks.md`
-2. Click "Start task" next to any task item
-3. Follow the systematic development approach
-
-## 🤝 Contributing
-
-1. Follow the spec-driven development process
-2. Use the task-based implementation approach
-3. Ensure all tests pass before submitting PRs
-4. Follow the established code organization patterns
-
-## 📄 License
-
-[Add your license here]
-
----
-
-**Happy Planning!** 🗺️✈️
