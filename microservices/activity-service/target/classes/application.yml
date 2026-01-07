@@ -30,10 +30,10 @@ server:
 external:
   google:
     places:
-      api-key: AIzaSyD98og3Q2yPav9k_aWhK5Ra2CUHyLNlEAc
+      api-key: ${GOOGLE_PLACES_API_KEY:}
   yelp:
     api:
-      key: 
+      key: ${YELP_API_KEY:} 
 
 # Management and Monitoring
 management:
