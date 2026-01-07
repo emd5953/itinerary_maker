@@ -110,9 +110,9 @@ management:
 external:
   google:
     maps:
-      api-key: 
+      api-key: ${GOOGLE_PLACES_API_KEY:}
     places:
-      api-key: AIzaSyDISh9kDpHkdf7RsdvGMugPTe92dtlA428
+      api-key: ${GOOGLE_PLACES_API_KEY:}
   yelp:
     api:
       key: 
