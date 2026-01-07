@@ -1,0 +1,12 @@
+C:\Users\nrndb\OneDrive\Documents\GitHub\itinerary_maker\microservices\activity-service\src\main\java\com\aspot\activity\model\BudgetLevel.java
+C:\Users\nrndb\OneDrive\Documents\GitHub\itinerary_maker\microservices\activity-service\src\main\java\com\aspot\activity\model\ActivityCategory.java
+C:\Users\nrndb\OneDrive\Documents\GitHub\itinerary_maker\microservices\activity-service\src\main\java\com\aspot\activity\repository\ActivityRepository.java
+C:\Users\nrndb\OneDrive\Documents\GitHub\itinerary_maker\microservices\activity-service\src\main\java\com\aspot\activity\controller\ActivityController.java
+C:\Users\nrndb\OneDrive\Documents\GitHub\itinerary_maker\microservices\activity-service\src\main\java\com\aspot\activity\model\Activity.java
+C:\Users\nrndb\OneDrive\Documents\GitHub\itinerary_maker\microservices\activity-service\src\main\java\com\aspot\activity\model\UserPreferences.java
+C:\Users\nrndb\OneDrive\Documents\GitHub\itinerary_maker\microservices\activity-service\src\main\java\com\aspot\activity\config\RestTemplateConfig.java
+C:\Users\nrndb\OneDrive\Documents\GitHub\itinerary_maker\microservices\activity-service\src\main\java\com\aspot\activity\model\Location.java
+C:\Users\nrndb\OneDrive\Documents\GitHub\itinerary_maker\microservices\activity-service\src\main\java\com\aspot\activity\ActivityServiceApplication.java
+C:\Users\nrndb\OneDrive\Documents\GitHub\itinerary_maker\microservices\activity-service\src\main\java\com\aspot\activity\service\ActivityService.java
+C:\Users\nrndb\OneDrive\Documents\GitHub\itinerary_maker\microservices\activity-service\src\main\java\com\aspot\activity\service\external\GooglePlacesService.java
+C:\Users\nrndb\OneDrive\Documents\GitHub\itinerary_maker\microservices\activity-service\src\main\java\com\aspot\activity\service\RecommendationService.java

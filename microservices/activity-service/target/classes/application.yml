@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: activity-service
+  
+  # Redis Configuration
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 1  # Use different database than other services
+      timeout: 2000ms
+    
+    # Elasticsearch Configuration
+    elasticsearch:
+      uris: http://localhost:9200
+      connection-timeout: 10s
+      socket-timeout: 30s
+  
+  # Cache Configuration
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000 # 1 hour for activity data
+
+# Server Configuration
+server:
+  port: 8083
+
+# External API Configuration
+external:
+  google:
+    places:
+      api-key: AIzaSyD98og3Q2yPav9k_aWhK5Ra2CUHyLNlEAc
+  yelp:
+    api:
+      key: 
+
+# Management and Monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    com.aspot.activity: INFO
+    org.springframework.data.elasticsearch: DEBUG

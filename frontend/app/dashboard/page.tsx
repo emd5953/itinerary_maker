@@ -2,6 +2,7 @@
 
 import { UserButton, useUser, RedirectToSignIn } from '@clerk/nextjs';
 import { MapPin, Calendar, Users, Plus, Search, Settings, Star, Clock } from 'lucide-react';
+import Link from 'next/link';
 import Logo from '../components/Logo';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -53,15 +54,17 @@ export default function Dashboard() {
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-3 gap-6 mb-20">
-          <Card className="cursor-pointer hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mb-4">
-                <Plus size={20} className="text-emerald-600" />
-              </div>
-              <CardTitle className="text-lg mb-2">New trip</CardTitle>
-              <CardDescription>Start from scratch</CardDescription>
-            </CardContent>
-          </Card>
+          <Link href="/dashboard/new">
+            <Card className="cursor-pointer hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mb-4">
+                  <Plus size={20} className="text-emerald-600" />
+                </div>
+                <CardTitle className="text-lg mb-2">New trip</CardTitle>
+                <CardDescription>Start from scratch</CardDescription>
+              </CardContent>
+            </Card>
+          </Link>
 
           <Card className="cursor-pointer hover:shadow-md transition-shadow">
             <CardContent className="p-6">
@@ -88,9 +91,11 @@ export default function Dashboard() {
         <div className="mb-20">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl font-medium text-foreground">Your trips</h2>
-            <Button className="gap-2">
-              <Plus size={16} />
-              New trip
+            <Button className="gap-2" asChild>
+              <Link href="/dashboard/new">
+                <Plus size={16} />
+                New trip
+              </Link>
             </Button>
           </div>
 
@@ -152,7 +157,9 @@ export default function Dashboard() {
                 </div>
                 <CardTitle className="text-base mb-2">Your first trip</CardTitle>
                 <CardDescription className="mb-4">Let's plan something</CardDescription>
-                <Button size="sm">Start</Button>
+                <Button size="sm" asChild>
+                  <Link href="/dashboard/new">Start</Link>
+                </Button>
               </CardContent>
             </Card>
           </div>

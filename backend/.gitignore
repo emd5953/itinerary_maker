@@ -39,3 +39,6 @@ application-local.properties
 # Test reports
 test-results/
 coverage/
+
+# Test databases
+.jqwik-database

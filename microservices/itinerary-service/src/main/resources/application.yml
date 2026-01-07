@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: itinerary-service
+  
+  # Database Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/itinerary_db
+    username: aspot_itinerary
+    password: aspot_itinerary
+    driver-class-name: org.postgresql.Driver
+  
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  
+  # Redis Configuration
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 2  # Use different database than other services
+      timeout: 2000ms
+  
+  # Cache Configuration
+  cache:
+    type: redis
+    redis:
+      time-to-live: 1800000 # 30 minutes for itinerary data
+
+# Server Configuration
+server:
+  port: 8082
+
+# External Service URLs
+external:
+  services:
+    user-service: http://localhost:8081
+    activity-service: http://localhost:8083
+
+# Management and Monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    com.aspot.itinerary: INFO
+    org.springframework.web.client: DEBUG

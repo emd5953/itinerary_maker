@@ -1,0 +1,4 @@
+com\aspot\activity\model\Location.class
+com\aspot\activity\config\RestTemplateConfig.class
+com\aspot\activity\model\Activity.class
+com\aspot\activity\model\ActivityCategory.class

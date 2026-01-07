@@ -40,11 +40,8 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // Public endpoints (note: context path is /api, so these are the actual paths)
-                .requestMatchers("/health", "/public/**").permitAll()
-                .requestMatchers("/actuator/**").permitAll()
-                // All other endpoints require authentication
-                .anyRequest().authenticated()
+                // Temporarily allow all requests for testing
+                .anyRequest().permitAll()
             )
             .addFilterBefore(clerkAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         

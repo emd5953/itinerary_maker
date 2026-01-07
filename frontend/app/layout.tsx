@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from '@clerk/nextjs';
+import { Toaster } from 'sonner';
 import "./globals.css";
 import { Providers } from "./providers";
 
@@ -20,6 +21,7 @@ export default function RootLayout({
           <Providers>
             {children}
           </Providers>
+          <Toaster />
         </body>
       </html>
     </ClerkProvider>
