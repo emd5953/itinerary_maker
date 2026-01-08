@@ -17,16 +17,18 @@ frontend/coverage/
 frontend/*.tsbuildinfo
 frontend/next-env.d.ts
 
-# Backend (Spring Boot/Maven)
-backend/target/
-backend/.mvn/wrapper/maven-wrapper.jar
-backend/.mvn/wrapper/MavenWrapperDownloader.java
-backend/application-local.yml
-backend/application-local.properties
+# Microservices (Spring Boot/Maven)
+microservices/*/target/
+microservices/*/.mvn/wrapper/maven-wrapper.jar
+microservices/*/.mvn/wrapper/MavenWrapperDownloader.java
+microservices/*/application-local.yml
+microservices/*/application-local.properties
 
 # Environment files
 .env*
 !.env.example
+microservices/*/.env
+microservices/*/.env.*
 
 # Logs
 npm-debug.log*

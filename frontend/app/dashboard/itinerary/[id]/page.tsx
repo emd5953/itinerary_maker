@@ -12,11 +12,13 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { apiService, type Itinerary, type ScheduledActivity, type WeatherForecast } from '@/lib/api';
+import { apiService, type Itinerary, type ScheduledActivity, type WeatherForecast, type Activity } from '@/lib/api';
 import DayPlanCard from '@/components/itinerary/DayPlanCard';
 import GPSMap from '@/components/itinerary/GPSMap';
 import WeatherCard from '@/components/itinerary/WeatherCard';
 import LocationServices from '@/components/itinerary/LocationServices';
+import ActivitySearchModal from '@/components/itinerary/ActivitySearchModal';
+import ActivityEditModal from '@/components/itinerary/ActivityEditModal';
 
 const formatTime = (timeString: string) => {
   const date = new Date(`2000-01-01T${timeString}`);
@@ -50,6 +52,11 @@ export default function ItineraryPage() {
   const [showWeather, setShowWeather] = useState(true);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [selectedMapDay, setSelectedMapDay] = useState(1);
+  const [showActivitySearch, setShowActivitySearch] = useState(false);
+  const [showActivityEdit, setShowActivityEdit] = useState(false);
+  const [selectedDayPlanId, setSelectedDayPlanId] = useState<string>('');
+  const [selectedActivity, setSelectedActivity] = useState<ScheduledActivity | null>(null);
+  const [suggestedStartTime, setSuggestedStartTime] = useState('10:00');
 
   const itineraryId = params.id as string;
 
@@ -108,8 +115,37 @@ export default function ItineraryPage() {
   };
 
   const handleActivityEdit = (activity: ScheduledActivity) => {
-    // TODO: Open activity edit modal
-    toast.info('Activity editing coming soon!');
+    setSelectedActivity(activity);
+    setShowActivityEdit(true);
+  };
+
+  const handleActivitySave = async (updates: Partial<ScheduledActivity>) => {
+    if (!selectedActivity) return;
+
+    try {
+      const token = await getToken();
+      const dayPlan = itinerary?.dayPlans.find(day => 
+        day.activities.some(act => act.id === selectedActivity.id)
+      );
+      
+      if (!dayPlan) {
+        toast.error('Could not find day plan for activity');
+        return;
+      }
+
+      const updatedItinerary = await apiService.updateActivity(
+        itinerary!.id, 
+        dayPlan.id, 
+        selectedActivity.id, 
+        updates, 
+        token
+      );
+      setItinerary(updatedItinerary);
+      toast.success('Activity updated successfully');
+    } catch (error) {
+      console.error('Error updating activity:', error);
+      toast.error('Failed to update activity');
+    }
   };
 
   const handleActivityRemove = async (dayPlanId: string, activityId: string) => {
@@ -154,8 +190,45 @@ export default function ItineraryPage() {
   };
 
   const handleAddActivity = (dayPlanId: string) => {
-    // TODO: Open activity search/add modal
-    toast.info('Adding activities coming soon!');
+    setSelectedDayPlanId(dayPlanId);
+    
+    // Calculate suggested start time based on existing activities
+    const dayPlan = itinerary?.dayPlans.find(day => day.id === dayPlanId);
+    if (dayPlan && dayPlan.activities.length > 0) {
+      const lastActivity = dayPlan.activities[dayPlan.activities.length - 1];
+      const lastEndTime = lastActivity.endTime;
+      
+      // Add 30 minutes buffer after last activity
+      const [hours, minutes] = lastEndTime.split(':').map(Number);
+      const totalMinutes = hours * 60 + minutes + 30;
+      const newHours = Math.floor(totalMinutes / 60);
+      const newMinutes = totalMinutes % 60;
+      
+      setSuggestedStartTime(`${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`);
+    } else {
+      setSuggestedStartTime('10:00');
+    }
+    
+    setShowActivitySearch(true);
+  };
+
+  const handleActivitySelect = async (activity: Activity, startTime: string, endTime: string) => {
+    try {
+      const token = await getToken();
+      const updatedItinerary = await apiService.addActivityToItinerary(
+        itinerary!.id,
+        selectedDayPlanId,
+        activity,
+        startTime + ':00', // Convert to HH:mm:ss format
+        endTime + ':00',
+        token
+      );
+      setItinerary(updatedItinerary);
+      toast.success('Activity added successfully');
+    } catch (error) {
+      console.error('Error adding activity:', error);
+      toast.error('Failed to add activity');
+    }
   };
 
   const handleShare = async () => {
@@ -402,6 +475,23 @@ export default function ItineraryPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Activity Search Modal */}
+      <ActivitySearchModal
+        isOpen={showActivitySearch}
+        onClose={() => setShowActivitySearch(false)}
+        destination={itinerary.destination}
+        onSelectActivity={handleActivitySelect}
+        suggestedStartTime={suggestedStartTime}
+      />
+
+      {/* Activity Edit Modal */}
+      <ActivityEditModal
+        isOpen={showActivityEdit}
+        onClose={() => setShowActivityEdit(false)}
+        activity={selectedActivity}
+        onSave={handleActivitySave}
+      />
     </div>
   );
 }

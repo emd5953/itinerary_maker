@@ -152,7 +152,6 @@ This **IS**:
 
 - **Setup Guide**: [docs/MICROSERVICES_SETUP.md](docs/MICROSERVICES_SETUP.md)
 - **Architecture**: [docs/MICROSERVICES_ARCHITECTURE.md](docs/MICROSERVICES_ARCHITECTURE.md)
-- **ReliaQuest Alignment**: [docs/RELIQUEST_ALIGNMENT.md](docs/RELIQUEST_ALIGNMENT.md)
 
 ## Next Steps (Optional Enhancements)
 

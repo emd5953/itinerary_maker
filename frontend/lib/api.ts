@@ -223,6 +223,56 @@ class ApiService {
       body: JSON.stringify({ origin, destination, mode }),
     });
   }
+
+  // Activity search and management
+  async searchActivities(destination: string, category?: string, limit = 20): Promise<Activity[]> {
+    const params = new URLSearchParams({
+      destination,
+      limit: limit.toString()
+    });
+    if (category) {
+      params.append('category', category);
+    }
+    return this.request(`/activities/search?${params.toString()}`);
+  }
+
+  async searchActivitiesByQuery(query: string, page = 0, size = 20): Promise<{ content: Activity[]; totalElements: number; totalPages: number }> {
+    const params = new URLSearchParams({
+      q: query,
+      page: page.toString(),
+      size: size.toString()
+    });
+    return this.request(`/activities/query?${params.toString()}`);
+  }
+
+  async getPopularActivities(destination: string, limit = 10): Promise<Activity[]> {
+    const params = new URLSearchParams({
+      destination,
+      limit: limit.toString()
+    });
+    return this.request(`/activities/popular?${params.toString()}`);
+  }
+
+  async getNearbyActivities(lat: number, lng: number, radius = 10, limit = 20): Promise<Activity[]> {
+    const params = new URLSearchParams({
+      lat: lat.toString(),
+      lng: lng.toString(),
+      radius: radius.toString(),
+      limit: limit.toString()
+    });
+    return this.request(`/activities/nearby?${params.toString()}`);
+  }
+
+  async addActivityToItinerary(itineraryId: string, dayPlanId: string, activity: Activity, startTime: string, endTime: string, token?: string | null): Promise<Itinerary> {
+    return this.request(`/itineraries/${itineraryId}/days/${dayPlanId}/activities`, {
+      method: 'POST',
+      body: JSON.stringify({
+        activity,
+        startTime,
+        endTime
+      }),
+    }, token);
+  }
 }
 
 export const apiService = new ApiService();

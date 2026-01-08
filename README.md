@@ -46,7 +46,7 @@ aSpot is a comprehensive travel itinerary planning application that helps users 
 
 ### Development Setup
 
-#### Option 1: Full Microservices (Recommended)
+#### Option 1: Microservices Architecture (Recommended)
 
 ```bash
 # Start all microservices with Docker Compose
@@ -56,22 +56,6 @@ docker-compose -f docker/docker-compose.microservices.yml up -d
 # Frontend: http://localhost:3000
 # API Gateway: http://localhost:8080
 # Individual services: 8081-8084
-```
-
-#### Option 2: Monolithic Backend (Legacy)
-
-```bash
-# Start infrastructure services
-docker-compose -f docker/docker-compose.dev.yml up -d
-
-# Start backend
-cd backend
-./mvnw spring-boot:run
-
-# Start frontend
-cd frontend
-npm install
-npm run dev
 ```
 
 
@@ -86,11 +70,9 @@ npm run dev
 │   ├── activity-service/  # Activity search service
 │   └── collaboration-service/ # Collaboration service
 ├── frontend/              # Next.js frontend application
-├── backend/               # Legacy monolithic backend (optional)
 ├── docker/                # Docker configuration files
 ├── config/                # Configuration files
-├── .kiro/                 # Kiro IDE specifications
-└── scripts/               # Development scripts
+└── .kiro/                 # Kiro IDE specifications
 ```
 
 ##  Documentation
@@ -99,12 +81,10 @@ npm run dev
 - **[Microservices Summary](./MICROSERVICES_SUMMARY.md)** - Quick overview
 - **[Microservices Setup Guide](./docs/MICROSERVICES_SETUP.md)** - Detailed setup
 - **[Microservices Architecture](./docs/MICROSERVICES_ARCHITECTURE.md)** - Architecture details
-- **[ReliaQuest Alignment](./docs/RELIQUEST_ALIGNMENT.md)** - Job interview prep
 
 ### Components
 - [Frontend Documentation](./frontend/README.md)
 - [GPS Setup Guide](./docs/GPS_SETUP.md) - Configure Google Maps integration
-- [Backend Documentation](./backend/README.md) (Legacy monolith)
 - [Docker Setup](./docker/README.md)
 - [Complete Documentation](./docs/README.md)
 

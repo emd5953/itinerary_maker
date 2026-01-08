@@ -61,10 +61,16 @@ docker-compose -f docker/docker-compose.microservices.yml down
 ### Step 1: Start Infrastructure
 
 ```bash
-# Start only databases and infrastructure
-docker-compose -f docker/docker-compose.dev.yml up -d
+# Start only infrastructure services (Redis, Elasticsearch)
+docker run -d --name aspot-redis -p 6379:6379 redis:7-alpine
 
-# Plus additional PostgreSQL instances for microservices
+docker run -d --name aspot-elasticsearch -p 9200:9200 -p 9300:9300 \
+  -e discovery.type=single-node \
+  -e xpack.security.enabled=false \
+  -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" \
+  docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+
+# Start PostgreSQL instances for microservices
 docker run -d --name postgres-user -p 5433:5432 \
   -e POSTGRES_DB=user_db \
   -e POSTGRES_USER=aspot_user \

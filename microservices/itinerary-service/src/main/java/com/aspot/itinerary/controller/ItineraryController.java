@@ -180,10 +180,145 @@ public class ItineraryController {
     }
     
     /**
+     * Add an activity to a day plan
+     */
+    @PostMapping("/{itineraryId}/days/{dayPlanId}/activities")
+    public ResponseEntity<Itinerary> addActivity(
+            @PathVariable UUID itineraryId,
+            @PathVariable UUID dayPlanId,
+            @RequestBody AddActivityRequest request) {
+        
+        log.info("Adding activity to itinerary {} day plan {}", itineraryId, dayPlanId);
+        
+        try {
+            Itinerary updatedItinerary = itineraryService.addActivity(itineraryId, dayPlanId, request);
+            return ResponseEntity.ok(updatedItinerary);
+        } catch (IllegalArgumentException e) {
+            log.warn("Activity addition failed: {}", e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Error adding activity: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
+    /**
+     * Update a specific activity in an itinerary
+     */
+    @PutMapping("/{itineraryId}/days/{dayPlanId}/activities/{activityId}")
+    public ResponseEntity<Itinerary> updateActivity(
+            @PathVariable UUID itineraryId,
+            @PathVariable UUID dayPlanId,
+            @PathVariable UUID activityId,
+            @RequestBody UpdateActivityRequest request) {
+        
+        log.info("Updating activity {} in itinerary {} day plan {}", activityId, itineraryId, dayPlanId);
+        
+        try {
+            Itinerary updatedItinerary = itineraryService.updateActivity(itineraryId, dayPlanId, activityId, request);
+            return ResponseEntity.ok(updatedItinerary);
+        } catch (IllegalArgumentException e) {
+            log.warn("Activity update failed: {}", e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Error updating activity: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
+    /**
+     * Remove an activity from an itinerary
+     */
+    @DeleteMapping("/{itineraryId}/days/{dayPlanId}/activities/{activityId}")
+    public ResponseEntity<Itinerary> removeActivity(
+            @PathVariable UUID itineraryId,
+            @PathVariable UUID dayPlanId,
+            @PathVariable UUID activityId) {
+        
+        log.info("Removing activity {} from itinerary {} day plan {}", activityId, itineraryId, dayPlanId);
+        
+        try {
+            Itinerary updatedItinerary = itineraryService.removeActivity(itineraryId, dayPlanId, activityId);
+            return ResponseEntity.ok(updatedItinerary);
+        } catch (IllegalArgumentException e) {
+            log.warn("Activity removal failed: {}", e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Error removing activity: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
+    /**
+     * Reorder activities within a day plan
+     */
+    @PutMapping("/{itineraryId}/days/{dayPlanId}/reorder")
+    public ResponseEntity<Itinerary> reorderActivities(
+            @PathVariable UUID itineraryId,
+            @PathVariable UUID dayPlanId,
+            @RequestBody ReorderActivitiesRequest request) {
+        
+        log.info("Reordering activities in itinerary {} day plan {}", itineraryId, dayPlanId);
+        
+        try {
+            Itinerary updatedItinerary = itineraryService.reorderActivities(itineraryId, dayPlanId, request.activityIds);
+            return ResponseEntity.ok(updatedItinerary);
+        } catch (IllegalArgumentException e) {
+            log.warn("Activity reordering failed: {}", e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Error reordering activities: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
+    /**
      * Health check endpoint
      */
     @GetMapping("/health")
     public ResponseEntity<String> health() {
         return ResponseEntity.ok("Itinerary Service is running");
+    }
+    
+    /**
+     * Request DTOs
+     */
+    public static class AddActivityRequest {
+        public ActivityDto activity;
+        public String startTime; // HH:mm:ss format
+        public String endTime;   // HH:mm:ss format
+    }
+    
+    public static class UpdateActivityRequest {
+        public String name;
+        public String description;
+        public String startTime; // HH:mm:ss format
+        public String endTime;   // HH:mm:ss format
+        public String websiteUrl;
+        public String priceRange;
+    }
+    
+    public static class ReorderActivitiesRequest {
+        public List<UUID> activityIds;
+    }
+    
+    public static class ActivityDto {
+        public String id;
+        public String name;
+        public String description;
+        public String category;
+        public Double rating;
+        public String priceRange;
+        public String websiteUrl;
+        public LocationDto location;
+    }
+    
+    public static class LocationDto {
+        public Double latitude;
+        public Double longitude;
+        public String address;
+        public String city;
+        public String country;
+        public String placeId;
     }
 }

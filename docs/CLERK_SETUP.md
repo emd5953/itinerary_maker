@@ -14,10 +14,10 @@ From your Clerk dashboard:
 
 ### 3. Configure Environment Variables
 
-Create a `.env` file in the backend directory:
+Create a `.env` file in the microservices directories or use environment variables:
 
 ```bash
-# Clerk Configuration
+# Clerk Configuration (for each microservice)
 CLERK_PUBLISHABLE_KEY=pk_test_your_actual_key_here
 CLERK_SECRET_KEY=sk_test_your_actual_secret_here
 CLERK_JWKS_URL=https://your-app-name.clerk.accounts.dev/.well-known/jwks.json
@@ -27,13 +27,13 @@ CLERK_JWKS_URL=https://your-app-name.clerk.accounts.dev/.well-known/jwks.json
 
 ### 4. Test Authentication
 
-1. Start your backend: `./mvnw spring-boot:run -Dspring.profiles.active=dev`
-2. The app will run on `http://localhost:8080`
+1. Start your microservices: `docker-compose -f docker/docker-compose.microservices.yml up -d`
+2. The API Gateway will run on `http://localhost:8080`
 
 **Test endpoints:**
 - `GET /api/health` - Public (no auth required)
-- `GET /api/auth/test` - Protected (requires Clerk token)
-- `GET /api/auth/me` - Protected (returns user info)
+- `GET /api/users/me` - Protected (requires Clerk token)
+- `GET /api/itineraries` - Protected (returns user's itineraries)
 
 ### 5. Frontend Integration
 
@@ -59,14 +59,14 @@ import { SignIn, SignUp, UserButton } from '@clerk/nextjs';
 
 ### 6. Making API Calls
 
-When making requests to your backend, include the Clerk token:
+When making requests to your microservices through the API Gateway, include the Clerk token:
 
 ```javascript
 // Get token from Clerk
 const token = await getToken();
 
-// Make authenticated request
-fetch('/api/auth/me', {
+// Make authenticated request through API Gateway
+fetch('http://localhost:8080/api/users/me', {
   headers: {
     'Authorization': `Bearer ${token}`
   }

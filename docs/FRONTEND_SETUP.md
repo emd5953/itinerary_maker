@@ -88,19 +88,20 @@ The landing page features a beautiful mobile app preview that showcases:
 3. **Sign In** (`/sign-in`) - Custom styled authentication
 4. **Sign Up** (`/sign-up`) - User registration flow
 
-### 🔗 **Backend Integration:**
+### 🔗 **Microservices Integration:**
 
-The frontend is ready to connect to your Spring Boot backend:
+The frontend is ready to connect to your microservices architecture:
 - API service layer in `app/lib/api.ts`
 - Authenticated requests with Clerk tokens
 - User profile management
 - Health check endpoints
+- API Gateway integration at `http://localhost:8080`
 
 ### 🎯 **Next Steps:**
 
 1. **Add your real Clerk keys** to see authentication in action
 2. **Customize the content** to match your specific features
 3. **Add more pages** as you build out the itinerary features
-4. **Connect to your backend** for real data
+4. **Connect to your microservices** for real data through the API Gateway
 
 The frontend perfectly captures the clean, modern aesthetic of your mobile app while providing a professional web experience! 🚀

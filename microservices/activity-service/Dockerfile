@@ -1,23 +1,12 @@
-FROM eclipse-temurin:17-jdk-alpine
-
+FROM maven:3.9-eclipse-temurin-17-alpine AS build
 WORKDIR /app
-
-# Copy Maven wrapper and pom.xml
-COPY mvnw .
-COPY mvnw.cmd .
-COPY .mvn .mvn
 COPY pom.xml .
+RUN mvn dependency:go-offline -B
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Download dependencies
-RUN ./mvnw dependency:go-offline -B
-
-# Copy source code
-COPY src src
-
-# Build the application
-RUN ./mvnw clean package -DskipTests
-
-# Run the application
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8083
-
-CMD ["java", "-jar", "target/activity-service-1.0.0.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

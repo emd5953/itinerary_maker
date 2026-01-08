@@ -47,7 +47,7 @@ YELP_API_KEY=your_yelp_api_key
 ### Generate Itinerary API
 
 ```bash
-POST /api/itineraries/generate
+POST http://localhost:8080/api/itineraries/generate
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
 
@@ -119,7 +119,8 @@ The system uses user preferences to personalize recommendations:
 ## 🧪 Testing
 
 ```bash
-# Run itinerary generation tests
+# Run itinerary generation tests (in microservices/itinerary-service)
+cd microservices/itinerary-service
 ./mvnw test -Dtest=ItineraryGenerationServiceTest
 
 # Test with real APIs (requires API keys)
@@ -170,6 +171,10 @@ When API keys are not configured, the system automatically generates realistic m
 
 ```
 User Request
+    ↓
+API Gateway (Port 8080)
+    ↓
+Itinerary Service (Port 8082)
     ↓
 ItineraryController
     ↓
