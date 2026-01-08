@@ -4,9 +4,9 @@ spring:
   
   # Database Configuration
   datasource:
-    url: jdbc:postgresql://localhost:5432/collaboration_db
-    username: aspot_collab
-    password: aspot_collab
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/collaboration_db}
+    username: ${SPRING_DATASOURCE_USERNAME:aspot_collab}
+    password: ${SPRING_DATASOURCE_PASSWORD:aspot_collab}
     driver-class-name: org.postgresql.Driver
   
   # JPA Configuration

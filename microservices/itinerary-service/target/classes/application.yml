@@ -4,9 +4,9 @@ spring:
   
   # Database Configuration
   datasource:
-    url: jdbc:postgresql://localhost:5432/itinerary_db
-    username: aspot_itinerary
-    password: aspot_itinerary
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/itinerary_db}
+    username: ${SPRING_DATASOURCE_USERNAME:aspot_itinerary}
+    password: ${SPRING_DATASOURCE_PASSWORD:aspot_itinerary}
     driver-class-name: org.postgresql.Driver
   
   # JPA Configuration
