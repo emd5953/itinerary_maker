@@ -27,7 +27,6 @@ public class ItineraryService {
     /**
      * Get itinerary by ID
      */
-    @Cacheable(value = "itineraries", key = "#id")
     public Optional<Itinerary> getItineraryById(UUID id) {
         log.info("Getting itinerary with id: {}", id);
         return itineraryRepository.findById(id);
@@ -74,10 +73,13 @@ public class ItineraryService {
     public Itinerary createItinerary(Itinerary itinerary) {
         log.info("Creating itinerary: {} for user: {}", itinerary.getTitle(), itinerary.getOwnerId());
         
+        // TODO: Re-enable user validation once authentication is properly set up
         // Validate owner exists
-        if (!userServiceClient.userExists(itinerary.getOwnerId())) {
-            throw new IllegalArgumentException("Owner user does not exist: " + itinerary.getOwnerId());
-        }
+        // if (!userServiceClient.userExists(itinerary.getOwnerId())) {
+        //     throw new IllegalArgumentException("Owner user does not exist: " + itinerary.getOwnerId());
+        // }
+        
+        log.info("Skipping user validation for development - user: {}", itinerary.getOwnerId());
         
         return itineraryRepository.save(itinerary);
     }

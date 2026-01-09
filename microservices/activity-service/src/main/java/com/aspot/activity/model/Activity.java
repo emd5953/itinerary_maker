@@ -9,6 +9,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
@@ -16,7 +17,9 @@ import java.util.List;
 @AllArgsConstructor
 @Document(indexName = "activities")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Activity {
+public class Activity implements Serializable {
+    
+    private static final long serialVersionUID = 1L;
     
     @Id
     private String id;

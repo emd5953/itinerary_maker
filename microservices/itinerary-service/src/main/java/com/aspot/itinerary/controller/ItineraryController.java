@@ -18,44 +18,31 @@ import java.util.UUID;
 @RequestMapping("/api/itineraries")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*")
 public class ItineraryController {
     
     private final ItineraryService itineraryService;
     private final ItineraryGenerationService generationService;
     
     /**
-     * Get itinerary by ID
+     * Get current user's itineraries (temporary - no auth)
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<Itinerary> getItinerary(@PathVariable UUID id) {
-        log.info("Getting itinerary with id: {}", id);
-        
-        Optional<Itinerary> itinerary = itineraryService.getItineraryById(id);
-        return itinerary.map(ResponseEntity::ok)
-                       .orElse(ResponseEntity.notFound().build());
-    }
-    
-    /**
-     * Get all itineraries for a user
-     */
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Itinerary>> getUserItineraries(@PathVariable UUID userId) {
+    @GetMapping("/my")
+    public ResponseEntity<List<Itinerary>> getMyItineraries(@RequestParam(required = false) String userId) {
         log.info("Getting itineraries for user: {}", userId);
         
-        List<Itinerary> itineraries = itineraryService.getUserItineraries(userId);
-        return ResponseEntity.ok(itineraries);
-    }
-    
-    /**
-     * Get owned itineraries for a user
-     */
-    @GetMapping("/user/{userId}/owned")
-    public ResponseEntity<List<Itinerary>> getOwnedItineraries(@PathVariable UUID userId) {
-        log.info("Getting owned itineraries for user: {}", userId);
+        if (userId == null || userId.isEmpty()) {
+            // For demo purposes, use the demo user ID
+            userId = "550e8400-e29b-41d4-a716-446655440000";
+        }
         
-        List<Itinerary> itineraries = itineraryService.getOwnedItineraries(userId);
-        return ResponseEntity.ok(itineraries);
+        try {
+            UUID userUuid = UUID.fromString(userId);
+            List<Itinerary> itineraries = itineraryService.getUserItineraries(userUuid);
+            return ResponseEntity.ok(itineraries);
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid user ID format: {}", userId);
+            return ResponseEntity.badRequest().build();
+        }
     }
     
     /**
@@ -81,6 +68,36 @@ public class ItineraryController {
     }
     
     /**
+     * Health check endpoint
+     */
+    @GetMapping("/health")
+    public ResponseEntity<String> health() {
+        return ResponseEntity.ok("Itinerary Service is running");
+    }
+    
+    /**
+     * Get all itineraries for a user
+     */
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Itinerary>> getUserItineraries(@PathVariable UUID userId) {
+        log.info("Getting itineraries for user: {}", userId);
+        
+        List<Itinerary> itineraries = itineraryService.getUserItineraries(userId);
+        return ResponseEntity.ok(itineraries);
+    }
+    
+    /**
+     * Get owned itineraries for a user
+     */
+    @GetMapping("/user/{userId}/owned")
+    public ResponseEntity<List<Itinerary>> getOwnedItineraries(@PathVariable UUID userId) {
+        log.info("Getting owned itineraries for user: {}", userId);
+        
+        List<Itinerary> itineraries = itineraryService.getOwnedItineraries(userId);
+        return ResponseEntity.ok(itineraries);
+    }
+    
+    /**
      * Create a new itinerary manually
      */
     @PostMapping
@@ -96,7 +113,7 @@ public class ItineraryController {
      */
     @PostMapping("/generate")
     public ResponseEntity<Itinerary> generateItinerary(
-            @RequestParam UUID userId,
+            @RequestParam String userId,
             @RequestParam String destination,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
@@ -104,7 +121,18 @@ public class ItineraryController {
         
         log.info("Generating itinerary for user {} to {} from {} to {}", userId, destination, startDate, endDate);
         
-        Itinerary generatedItinerary = generationService.generateItinerary(userId, destination, startDate, endDate, title);
+        // For now, convert string userId to UUID for internal processing
+        // In production, this should be handled by proper user management
+        UUID userUuid;
+        try {
+            userUuid = UUID.fromString(userId);
+        } catch (IllegalArgumentException e) {
+            // If it's not a UUID, create a deterministic UUID from the string
+            userUuid = UUID.nameUUIDFromBytes(userId.getBytes());
+            log.info("Converted string userId {} to UUID {}", userId, userUuid);
+        }
+        
+        Itinerary generatedItinerary = generationService.generateItinerary(userUuid, destination, startDate, endDate, title);
         Itinerary savedItinerary = itineraryService.createItinerary(generatedItinerary);
         
         return ResponseEntity.ok(savedItinerary);
@@ -273,11 +301,15 @@ public class ItineraryController {
     }
     
     /**
-     * Health check endpoint
+     * Get itinerary by ID - put this at the end to avoid conflicts
      */
-    @GetMapping("/health")
-    public ResponseEntity<String> health() {
-        return ResponseEntity.ok("Itinerary Service is running");
+    @GetMapping("/{id}")
+    public ResponseEntity<Itinerary> getItinerary(@PathVariable UUID id) {
+        log.info("Getting itinerary with id: {}", id);
+        
+        Optional<Itinerary> itinerary = itineraryService.getItineraryById(id);
+        return itinerary.map(ResponseEntity::ok)
+                       .orElse(ResponseEntity.notFound().build());
     }
     
     /**

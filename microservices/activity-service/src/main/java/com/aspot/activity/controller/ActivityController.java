@@ -17,7 +17,6 @@ import java.util.Optional;
 @RequestMapping("/api/activities")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*")
 public class ActivityController {
     
     private final ActivityService activityService;
@@ -46,8 +45,14 @@ public class ActivityController {
         
         log.info("Searching activities for destination: {}, category: {}, limit: {}", destination, category, limit);
         
-        List<Activity> activities = activityService.searchActivities(destination, category, limit);
-        return ResponseEntity.ok(activities);
+        try {
+            List<Activity> activities = activityService.searchActivities(destination, category, limit);
+            log.info("Successfully found {} activities", activities.size());
+            return ResponseEntity.ok(activities);
+        } catch (Exception e) {
+            log.error("Error searching activities: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).body(List.of());
+        }
     }
     
     /**
@@ -91,8 +96,14 @@ public class ActivityController {
         
         log.info("Getting popular activities for destination: {}, limit: {}", destination, limit);
         
-        List<Activity> activities = activityService.getPopularActivities(destination, limit);
-        return ResponseEntity.ok(activities);
+        try {
+            List<Activity> activities = activityService.getPopularActivities(destination, limit);
+            log.info("Successfully found {} popular activities", activities.size());
+            return ResponseEntity.ok(activities);
+        } catch (Exception e) {
+            log.error("Error getting popular activities: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).body(List.of());
+        }
     }
     
     /**
@@ -106,8 +117,14 @@ public class ActivityController {
         
         log.info("Getting recommendations for destination: {}, limit: {}, preferences: {}", destination, limit, preferences);
         
-        List<Activity> recommendations = recommendationService.generateRecommendations(destination, preferences, limit);
-        return ResponseEntity.ok(recommendations);
+        try {
+            List<Activity> recommendations = recommendationService.generateRecommendations(destination, preferences, limit);
+            log.info("Successfully generated {} recommendations", recommendations.size());
+            return ResponseEntity.ok(recommendations);
+        } catch (Exception e) {
+            log.error("Error generating recommendations: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).body(List.of());
+        }
     }
     
     /**

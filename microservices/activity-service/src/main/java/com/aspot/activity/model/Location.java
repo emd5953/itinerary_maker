@@ -6,10 +6,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import java.io.Serializable;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Location {
+public class Location implements Serializable {
+    
+    private static final long serialVersionUID = 1L;
     
     @Field(type = FieldType.Double)
     private Double latitude;

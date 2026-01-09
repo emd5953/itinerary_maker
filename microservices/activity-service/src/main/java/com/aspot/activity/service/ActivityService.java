@@ -37,32 +37,40 @@ public class ActivityService {
     public List<Activity> searchActivities(String destination, String category, int limit) {
         log.info("Searching activities for destination: {}, category: {}", destination, category);
         
-        // First check if we have cached activities in Elasticsearch
-        List<Activity> cachedActivities;
-        if (category != null && !category.isEmpty()) {
-            try {
-                ActivityCategory activityCategory = ActivityCategory.valueOf(category.toUpperCase());
-                cachedActivities = activityRepository.findByDestinationIgnoreCaseAndCategory(destination, activityCategory);
-            } catch (IllegalArgumentException e) {
+        try {
+            // First check if we have cached activities in Elasticsearch
+            List<Activity> cachedActivities;
+            if (category != null && !category.isEmpty()) {
+                try {
+                    ActivityCategory activityCategory = ActivityCategory.valueOf(category.toUpperCase());
+                    cachedActivities = activityRepository.findByDestinationIgnoreCaseAndCategory(destination, activityCategory);
+                } catch (IllegalArgumentException e) {
+                    cachedActivities = activityRepository.findByDestinationIgnoreCase(destination);
+                }
+            } else {
                 cachedActivities = activityRepository.findByDestinationIgnoreCase(destination);
             }
-        } else {
-            cachedActivities = activityRepository.findByDestinationIgnoreCase(destination);
-        }
-        
-        // If we have enough cached activities, return them
-        if (cachedActivities.size() >= limit) {
-            log.info("Found {} cached activities for {}", cachedActivities.size(), destination);
-            return cachedActivities.subList(0, Math.min(limit, cachedActivities.size()));
+            
+            // If we have enough cached activities, return them
+            if (cachedActivities.size() >= limit) {
+                log.info("Found {} cached activities for {}", cachedActivities.size(), destination);
+                return cachedActivities.subList(0, Math.min(limit, cachedActivities.size()));
+            }
+        } catch (Exception e) {
+            log.warn("Elasticsearch query failed, falling back to external APIs: {}", e.getMessage());
         }
         
         // Otherwise, fetch from external APIs and cache them
         List<Activity> freshActivities = googlePlacesService.searchActivities(destination, category, limit);
         
-        // Save to Elasticsearch for future queries
+        // Try to save to Elasticsearch for future queries (but don't fail if it doesn't work)
         if (!freshActivities.isEmpty()) {
-            activityRepository.saveAll(freshActivities);
-            log.info("Cached {} new activities for {}", freshActivities.size(), destination);
+            try {
+                activityRepository.saveAll(freshActivities);
+                log.info("Cached {} new activities for {}", freshActivities.size(), destination);
+            } catch (Exception e) {
+                log.warn("Failed to cache activities in Elasticsearch: {}", e.getMessage());
+            }
         }
         
         return freshActivities;
@@ -101,16 +109,26 @@ public class ActivityService {
     public List<Activity> getPopularActivities(String destination, int limit) {
         log.info("Getting popular activities for: {}", destination);
         
-        List<Activity> popularActivities = activityRepository.findByIsPopularTrueAndDestinationIgnoreCase(destination);
+        List<Activity> popularActivities;
+        try {
+            popularActivities = activityRepository.findByIsPopularTrueAndDestinationIgnoreCase(destination);
+        } catch (Exception e) {
+            log.warn("Elasticsearch query failed for popular activities, using external APIs: {}", e.getMessage());
+            popularActivities = List.of();
+        }
         
         if (popularActivities.isEmpty()) {
             // Fetch popular activities from external APIs
             popularActivities = googlePlacesService.searchActivities(destination, "popular", limit);
             
-            // Mark them as popular and save
+            // Mark them as popular and try to save
             popularActivities.forEach(activity -> activity.setIsPopular(true));
             if (!popularActivities.isEmpty()) {
-                activityRepository.saveAll(popularActivities);
+                try {
+                    activityRepository.saveAll(popularActivities);
+                } catch (Exception e) {
+                    log.warn("Failed to cache popular activities: {}", e.getMessage());
+                }
             }
         }
         

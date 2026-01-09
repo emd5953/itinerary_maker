@@ -26,31 +26,37 @@ public class RecommendationService {
     public List<Activity> generateRecommendations(String destination, UserPreferences preferences, int maxResults) {
         log.info("Generating recommendations for destination: {} with preferences: {}", destination, preferences);
         
-        List<Activity> allActivities = new ArrayList<>();
-        
-        // Get activities for each user interest
-        if (preferences.getInterests() != null && !preferences.getInterests().isEmpty()) {
-            for (String interest : preferences.getInterests()) {
-                List<Activity> activities = googlePlacesService.searchActivities(destination, interest, 10);
-                allActivities.addAll(activities);
+        try {
+            List<Activity> allActivities = new ArrayList<>();
+            
+            // Get activities for each user interest
+            if (preferences.getInterests() != null && !preferences.getInterests().isEmpty()) {
+                for (String interest : preferences.getInterests()) {
+                    List<Activity> activities = googlePlacesService.searchActivities(destination, interest, 10);
+                    allActivities.addAll(activities);
+                }
+            } else {
+                // If no specific interests, get popular activities from all categories
+                allActivities.addAll(getPopularActivitiesAllCategories(destination));
             }
-        } else {
-            // If no specific interests, get popular activities from all categories
-            allActivities.addAll(getPopularActivitiesAllCategories(destination));
+            
+            // Remove duplicates based on name and location
+            allActivities = removeDuplicates(allActivities);
+            
+            // Score and rank activities based on user preferences
+            List<ScoredActivity> scoredActivities = scoreActivities(allActivities, preferences);
+            
+            // Sort by score (highest first) and return top results
+            return scoredActivities.stream()
+                    .sorted((a, b) -> Double.compare(b.score, a.score))
+                    .limit(maxResults)
+                    .map(sa -> sa.activity)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Error generating recommendations: {}", e.getMessage(), e);
+            // Return mock activities as fallback
+            return googlePlacesService.searchActivities(destination, "popular", maxResults);
         }
-        
-        // Remove duplicates based on name and location
-        allActivities = removeDuplicates(allActivities);
-        
-        // Score and rank activities based on user preferences
-        List<ScoredActivity> scoredActivities = scoreActivities(allActivities, preferences);
-        
-        // Sort by score (highest first) and return top results
-        return scoredActivities.stream()
-                .sorted((a, b) -> Double.compare(b.score, a.score))
-                .limit(maxResults)
-                .map(sa -> sa.activity)
-                .collect(Collectors.toList());
     }
     
     /**
@@ -84,7 +90,7 @@ public class RecommendationService {
         score += interestScore * 40.0;
         
         // Budget compatibility (weight: 15%)
-        double budgetScore = calculateBudgetMatch(activity, preferences.getBudgetLevel());
+        double budgetScore = calculateBudgetMatch(activity, preferences.getBudgetLevelEnum());
         score += budgetScore * 15.0;
         
         // Popularity bonus (weight: 5%)
@@ -141,24 +147,33 @@ public class RecommendationService {
         
         String priceRange = activity.getPriceRange();
         
-        return switch (budgetLevel) {
-            case BUDGET -> switch (priceRange) {
-                case "Free", "$" -> 1.0;
-                case "$$" -> 0.6;
-                default -> 0.5;
+        if (budgetLevel == BudgetLevel.BUDGET) {
+            return switch (priceRange) {
+                case "Free" -> 1.0;
+                case "$" -> 0.6;
+                case "$$" -> 0.3;
+                default -> 0.2;
             };
-            case MID_RANGE -> switch (priceRange) {
+        } else if (budgetLevel == BudgetLevel.MID_RANGE) {
+            return switch (priceRange) {
                 case "Free" -> 0.8;
                 case "$" -> 1.0;
-                case "$$" -> 0.7;
+                case "$$" -> 0.9;
+                case "$$$" -> 0.7;
                 default -> 0.5;
             };
-            case LUXURY -> switch (priceRange) {
-                case "Free", "$" -> 0.4;
-                case "$$" -> 1.0;
+        } else if (budgetLevel == BudgetLevel.LUXURY) {
+            return switch (priceRange) {
+                case "Free" -> 0.4;
+                case "$" -> 0.6;
+                case "$$" -> 0.8;
+                case "$$$" -> 1.0;
+                case "$$$$" -> 1.0;
                 default -> 0.5;
             };
-        };
+        }
+        
+        return 0.5; // Default fallback
     }
     
     /**
@@ -170,8 +185,12 @@ public class RecommendationService {
         String[] categories = {"sights", "food", "outdoor", "culture"};
         
         for (String category : categories) {
-            List<Activity> categoryActivities = googlePlacesService.searchActivities(destination, category, 5);
-            popularActivities.addAll(categoryActivities);
+            try {
+                List<Activity> categoryActivities = googlePlacesService.searchActivities(destination, category, 5);
+                popularActivities.addAll(categoryActivities);
+            } catch (Exception e) {
+                log.warn("Failed to get activities for category {}: {}", category, e.getMessage());
+            }
         }
         
         return popularActivities;

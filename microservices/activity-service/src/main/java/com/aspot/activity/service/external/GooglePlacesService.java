@@ -179,17 +179,41 @@ public class GooglePlacesService {
     private List<Activity> getMockActivities(String destination, String category) {
         List<Activity> mockActivities = new ArrayList<>();
         
+        // Default category if none provided
+        String effectiveCategory = (category != null && !category.isEmpty()) ? category : "sights";
+        
+        // Map common category names to valid enum values
+        ActivityCategory activityCategory;
+        try {
+            activityCategory = ActivityCategory.valueOf(effectiveCategory.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            // Map common names to valid categories
+            activityCategory = switch (effectiveCategory.toLowerCase()) {
+                case "attraction", "attractions", "tourist", "popular" -> ActivityCategory.SIGHTS;
+                case "restaurant", "restaurants", "dining", "food" -> ActivityCategory.FOOD;
+                case "park", "parks", "nature", "outdoor" -> ActivityCategory.OUTDOOR;
+                case "bar", "bars", "club", "clubs", "nightlife" -> ActivityCategory.NIGHTLIFE;
+                case "shop", "shopping", "mall", "market" -> ActivityCategory.SHOPPING;
+                case "museum", "museums", "art", "culture" -> ActivityCategory.CULTURE;
+                case "theater", "cinema", "entertainment" -> ActivityCategory.ENTERTAINMENT;
+                case "sport", "sports", "gym", "fitness" -> ActivityCategory.SPORTS;
+                case "spa", "wellness", "health" -> ActivityCategory.WELLNESS;
+                case "adventure", "extreme", "thrill" -> ActivityCategory.ADVENTURE;
+                default -> ActivityCategory.SIGHTS;
+            };
+        }
+        
         // Create some mock high-rated activities
         for (int i = 1; i <= 5; i++) {
             Activity activity = new Activity();
             activity.setId(UUID.randomUUID().toString());
-            activity.setName(String.format("Top %s Spot #%d in %s", category, i, destination));
-            activity.setDescription(String.format("Highly rated %s activity in %s", category, destination));
+            activity.setName(String.format("Top %s Spot #%d in %s", effectiveCategory, i, destination));
+            activity.setDescription(String.format("Highly rated %s activity in %s", effectiveCategory, destination));
             activity.setDestination(destination);
             activity.setRating(4.0 + (i * 0.2)); // 4.2, 4.4, 4.6, 4.8, 5.0
             activity.setReviewCount(100 + (i * 50));
             activity.setPriceRange("$");
-            activity.setCategory(ActivityCategory.valueOf(category.toUpperCase()));
+            activity.setCategory(activityCategory);
             activity.setIsPopular(true);
             
             // Mock location
@@ -198,6 +222,13 @@ public class GooglePlacesService {
             location.setLongitude(-74.0060 + (i * 0.01));
             location.setAddress(String.format("%d Main St, %s", i * 100, destination));
             activity.setLocation(location);
+            
+            // Add some tags
+            List<String> tags = new ArrayList<>();
+            tags.add(effectiveCategory);
+            tags.add("popular");
+            tags.add("recommended");
+            activity.setTags(tags);
             
             mockActivities.add(activity);
         }

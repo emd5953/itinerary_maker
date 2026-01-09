@@ -1,8 +1,10 @@
 package com.aspot.itinerary.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -12,7 +14,8 @@ import java.util.UUID;
 @Entity
 @Table(name = "scheduled_activities")
 @Data
-public class ScheduledActivity {
+public class ScheduledActivity implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -53,6 +56,7 @@ public class ScheduledActivity {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "day_plan_id")
+    @JsonBackReference("dayplan-activities")
     private DayPlan dayPlan;
     
     // External activity reference (from Activity Service)
