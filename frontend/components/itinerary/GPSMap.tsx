@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import { DayPlan, ScheduledActivity } from '@/lib/api';
+import { loadGoogleMaps, isGoogleMapsLoaded } from '@/lib/google-maps-loader';
 import MapFallback from './MapFallback';
 
 interface GPSMapProps {
@@ -94,32 +95,14 @@ export default function GPSMap({
           return;
         }
 
-        // Check if Google Maps is already loaded
-        if (typeof window.google === 'undefined') {
+        // Use centralized loader to prevent multiple script loads
+        if (!isGoogleMapsLoaded()) {
           console.log('Loading Google Maps script...');
-          
-          // Create and load the script
-          const script = document.createElement('script');
-          script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,geometry&callback=initGoogleMap`;
-          script.async = true;
-          script.defer = true;
-          
-          // Create a global callback function
-          (window as any).initGoogleMap = () => {
-            console.log('Google Maps callback triggered');
-            createMap();
-          };
-          
-          script.onerror = (error) => {
-            console.error('Failed to load Google Maps script:', error);
-            setApiKeyMissing(true);
-          };
-          
-          document.head.appendChild(script);
-        } else {
-          console.log('Google Maps already loaded');
-          createMap();
+          await loadGoogleMaps(apiKey);
         }
+        
+        console.log('Google Maps loaded, creating map instance...');
+        createMap();
         
         function createMap() {
           try {
@@ -162,6 +145,9 @@ export default function GPSMap({
         
       } catch (error) {
         console.error('Error in initMap:', error);
+        if (error instanceof Error && error.message.includes('Google Maps')) {
+          console.error('Google Maps loading failed:', error.message);
+        }
         setApiKeyMissing(true);
       }
     };

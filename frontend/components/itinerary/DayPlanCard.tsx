@@ -42,7 +42,7 @@ export default function DayPlanCard({
   };
 
   const getWeatherIcon = (condition: string) => {
-    const icons: Record<string, JSX.Element> = {
+    const icons: Record<string, React.ReactElement> = {
       'clear': <Sun className="w-4 h-4 text-yellow-500" />,
       'cloudy': <Cloud className="w-4 h-4 text-gray-500" />,
       'rain': <CloudRain className="w-4 h-4 text-blue-500" />,
