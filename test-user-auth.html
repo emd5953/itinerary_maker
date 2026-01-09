@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test User Authentication Flow</title>
+</head>
+<body>
+    <h1>Testing User Authentication Integration</h1>
+    
+    <h2>Mock Clerk User</h2>
+    <pre id="mockUser"></pre>
+    
+    <button onclick="testUserMapping()">Test User Mapping</button>
+    <button onclick="testCreateUser()">Test Create User</button>
+    
+    <div id="results"></div>
+
+    <script>
+        // Mock Clerk user for testing
+        const mockClerkUser = {
+            id: 'user_test123456789',
+            emailAddresses: [{ emailAddress: 'test@example.com' }],
+            fullName: 'Test User',
+            firstName: 'Test',
+            imageUrl: 'https://example.com/avatar.jpg'
+        };
+        
+        document.getElementById('mockUser').textContent = JSON.stringify(mockClerkUser, null, 2);
+        
+        async function testUserMapping() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h3>Testing User Mapping...</h3>';
+            
+            try {
+                // Test if user exists
+                const response = await fetch(`http://localhost:8080/api/users/clerk/${mockClerkUser.id}`, {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    const user = await response.json();
+                    resultsDiv.innerHTML += `<p>✅ User exists: ${user.name} (${user.id})</p>`;
+                } else if (response.status === 404) {
+                    resultsDiv.innerHTML += `<p>ℹ️ User doesn't exist yet (expected for new users)</p>`;
+                } else {
+                    resultsDiv.innerHTML += `<p>❌ Error checking user: ${response.status}</p>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML += `<p>❌ Network error: ${error.message}</p>`;
+            }
+        }
+        
+        async function testCreateUser() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML += '<h3>Testing User Creation...</h3>';
+            
+            const userData = {
+                clerkId: mockClerkUser.id,
+                email: mockClerkUser.emailAddresses[0].emailAddress,
+                name: mockClerkUser.fullName,
+                profilePicture: mockClerkUser.imageUrl,
+                preferences: {
+                    interests: ['sights', 'food'],
+                    budgetLevel: 'MID_RANGE',
+                    travelStyle: 'BALANCED',
+                    dietaryRestrictions: [],
+                    preferredTransport: 'WALKING'
+                }
+            };
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+                
+                if (response.ok) {
+                    const user = await response.json();
+                    resultsDiv.innerHTML += `<p>✅ User created: ${user.name} (${user.id})</p>`;
+                } else {
+                    const error = await response.text();
+                    resultsDiv.innerHTML += `<p>❌ Failed to create user: ${response.status} - ${error}</p>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML += `<p>❌ Network error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
