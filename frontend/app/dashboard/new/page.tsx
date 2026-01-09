@@ -35,7 +35,7 @@ export default function NewTrip() {
   const loadUserPreferences = async () => {
     try {
       const token = await getToken();
-      const preferences = await apiService.getUserPreferences(token);
+      const preferences = await apiService.getUserPreferences(token, user);
       setUserPreferences(preferences);
     } catch (error) {
       console.warn('Could not load user preferences:', error);
@@ -78,7 +78,7 @@ export default function NewTrip() {
         destination: formData.destination,
         startDate: formData.startDate,
         endDate: formData.endDate,
-      }, token);
+      }, token, user); // Pass the Clerk user
       
       toast.success('Itinerary generated successfully!');
       router.push(`/dashboard/itinerary/${itinerary.id}`);

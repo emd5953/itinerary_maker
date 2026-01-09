@@ -7,8 +7,9 @@ import Logo from '../components/Logo';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { apiService } from '@/lib/api';
+import { apiService, waitForApiReady } from '@/lib/api';
 import { useState, useEffect } from 'react';
+import ConnectionStatus from '@/components/ui/connection-status';
 
 export default function Dashboard() {
   const { isLoaded, isSignedIn, user } = useUser();
@@ -26,16 +27,32 @@ export default function Dashboard() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
+      
+      // Wait for API to be ready before making requests
+      console.log('🚀 Dashboard loading - checking API readiness...');
+      const apiReady = await waitForApiReady(5); // Try 5 times
+      
+      if (!apiReady) {
+        console.warn('⚠️ API not ready, but continuing with requests...');
+      }
+      
       const token = await getToken();
       
-      // Load user preferences and itineraries in parallel
+      // Load user preferences and itineraries in parallel, passing the Clerk user
       const [preferences, userItineraries] = await Promise.all([
-        apiService.getUserPreferences(token).catch(() => null),
-        apiService.getMyItineraries(token).catch(() => [])
+        apiService.getUserPreferences(token, user).catch((error) => {
+          console.warn('Failed to load user preferences:', error);
+          return null;
+        }),
+        apiService.getMyItineraries(token, user).catch((error) => {
+          console.warn('Failed to load itineraries:', error);
+          return [];
+        })
       ]);
       
       setUserPreferences(preferences);
       setItineraries(userItineraries);
+      console.log('✅ Dashboard data loaded successfully');
     } catch (error) {
       console.warn('Could not load dashboard data:', error);
     } finally {
@@ -114,6 +131,7 @@ export default function Dashboard() {
           <div className="flex justify-between items-center h-16">
             <Logo size="sm" />
             <div className="flex items-center gap-4">
+              <ConnectionStatus />
               <Link href="/dashboard/preferences">
                 <Button variant="ghost" size="icon">
                   <Settings size={18} />

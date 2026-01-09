@@ -30,7 +30,8 @@ const BUDGET_LEVELS = [
 
 const TRAVEL_STYLES = [
   { id: 'RELAXED', label: 'Relaxed', description: '3-4 activities per day', icon: '🌴' },
-  { id: 'MODERATE', label: 'Moderate', description: '4-5 activities per day', icon: '🚶' },
+  { id: 'BALANCED', label: 'Balanced', description: '4-5 activities per day', icon: '🚶' },
+  { id: 'ADVENTURE', label: 'Adventure', description: '5-6 activities per day', icon: '🏔️' },
   { id: 'PACKED', label: 'Packed', description: '6+ activities per day', icon: '🏃' },
 ];
 
@@ -44,24 +45,24 @@ const DIETARY_RESTRICTIONS = [
 ];
 
 const TRANSPORT_OPTIONS = [
-  { id: 'walking', label: 'Walking', icon: '🚶' },
-  { id: 'public_transport', label: 'Public Transport', icon: '🚇' },
-  { id: 'car', label: 'Car/Taxi', icon: '�,' },
-  { id: 'bike', label: 'Bike', icon: '�' },
+  { id: 'WALKING', label: 'Walking', icon: '🚶' },
+  { id: 'PUBLIC_TRANSPORT', label: 'Public Transport', icon: '🚇' },
+  { id: 'CAR', label: 'Car/Taxi', icon: '🚗' },
+  { id: 'BIKE', label: 'Bike', icon: '🚴' },
   { id: 'MIXED', label: 'Mixed', icon: '🚌' },
 ];
 
 export default function PreferencesPage() {
-  const { isLoaded, isSignedIn } = useUser();
+  const { isLoaded, isSignedIn, user } = useUser();
   const { getToken } = useAuth();
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [preferences, setPreferences] = useState({
     interests: [] as string[],
     budgetLevel: 'MID_RANGE',
-    travelStyle: 'MODERATE',
+    travelStyle: 'BALANCED', // Fixed: Use valid enum value
     dietaryRestrictions: [] as string[],
-    preferredTransport: 'MIXED',
+    preferredTransport: 'WALKING', // Fixed: Use valid value
   });
 
   useEffect(() => {
@@ -73,14 +74,14 @@ export default function PreferencesPage() {
   const loadUserPreferences = async () => {
     try {
       const token = await getToken();
-      const userPrefs = await apiService.getUserPreferences(token);
+      const userPrefs = await apiService.getUserPreferences(token, user);
       if (userPrefs) {
         setPreferences({
           interests: userPrefs.interests || [],
           budgetLevel: userPrefs.budgetLevel || 'MID_RANGE',
-          travelStyle: userPrefs.travelStyle || 'MODERATE',
+          travelStyle: userPrefs.travelStyle || 'BALANCED', // Fixed: Use valid enum value
           dietaryRestrictions: userPrefs.dietaryRestrictions || [],
-          preferredTransport: userPrefs.preferredTransport || 'MIXED',
+          preferredTransport: userPrefs.preferredTransport || 'WALKING', // Fixed: Use valid value
         });
       }
     } catch (error) {
@@ -125,7 +126,7 @@ export default function PreferencesPage() {
     setSaving(true);
     try {
       const token = await getToken();
-      await apiService.updateUserPreferences(preferences, token);
+      await apiService.updateUserPreferences(preferences, token, user);
       toast.success('Preferences saved successfully!');
       router.push('/dashboard');
     } catch (error) {

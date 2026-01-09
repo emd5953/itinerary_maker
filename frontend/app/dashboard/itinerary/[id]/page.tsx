@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { UserButton, useUser, useAuth, RedirectToSignIn } from '@clerk/nextjs';
-import { ArrowLeft, MapPin, Calendar, Clock, Star, ExternalLink, Trash2, Share2, Map, Download, List } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Trash2, Share2, Map, Download, List } from 'lucide-react';
 import Link from 'next/link';
 import Logo from '../../../components/Logo';
 import { Button } from '@/components/ui/button';
@@ -19,15 +19,6 @@ import WeatherCard from '@/components/itinerary/WeatherCard';
 import LocationServices from '@/components/itinerary/LocationServices';
 import ActivitySearchModal from '@/components/itinerary/ActivitySearchModal';
 import ActivityEditModal from '@/components/itinerary/ActivityEditModal';
-
-const formatTime = (timeString: string) => {
-  const date = new Date(`2000-01-01T${timeString}`);
-  return date.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  });
-};
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
