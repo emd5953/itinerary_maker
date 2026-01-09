@@ -1,0 +1,70 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: 
+              - "http://localhost:3000"
+              - "http://localhost:3001"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+  
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:redis}
+      port: ${SPRING_REDIS_PORT:6379}
+
+# Service URLs for Docker environment
+services:
+  user-service:
+    url: ${USER_SERVICE_URL:http://user-service:8081}
+  itinerary-service:
+    url: ${ITINERARY_SERVICE_URL:http://itinerary-service:8082}
+  activity-service:
+    url: ${ACTIVITY_SERVICE_URL:http://activity-service:8083}
+  collaboration-service:
+    url: ${COLLABORATION_SERVICE_URL:http://collaboration-service:8084}
+
+# Clerk Configuration
+clerk:
+  jwks:
+    url: ${CLERK_JWKS_URL:https://safe-heron-62.clerk.accounts.dev/.well-known/jwks.json}
+  secret:
+    key: ${CLERK_SECRET_KEY:sk_test_Jvr7e1Q5VSKYR6i2mdXCqYSv6cmgxDNo3gbC4EH6vY}
+
+# Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,gateway
+      cors:
+        allowed-origins: 
+          - "http://localhost:3000"
+          - "http://localhost:3001"
+          - "http://localhost:3002"
+        allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+        allowed-headers: "*"
+        allow-credentials: true
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.aspot.gateway: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty: INFO
