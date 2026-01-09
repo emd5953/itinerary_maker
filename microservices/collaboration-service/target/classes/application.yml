@@ -22,8 +22,8 @@ spring:
   # Redis Configuration
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
       database: 3  # Use different database than other services
       timeout: 2000ms
 
