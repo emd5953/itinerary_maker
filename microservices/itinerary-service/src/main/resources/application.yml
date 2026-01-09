@@ -22,8 +22,8 @@ spring:
   # Redis Configuration
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
       database: 2  # Use different database than other services
       timeout: 2000ms
   
@@ -40,8 +40,8 @@ server:
 # External Service URLs
 external:
   services:
-    user-service: http://localhost:8081
-    activity-service: http://localhost:8083
+    user-service: ${USER_SERVICE_URL:http://localhost:8081}
+    activity-service: ${ACTIVITY_SERVICE_URL:http://localhost:8083}
 
 # Management and Monitoring
 management:

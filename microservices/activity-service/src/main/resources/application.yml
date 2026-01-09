@@ -5,14 +5,14 @@ spring:
   # Redis Configuration
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
       database: 1  # Use different database than other services
       timeout: 2000ms
     
     # Elasticsearch Configuration
     elasticsearch:
-      uris: http://localhost:9200
+      uris: ${SPRING_ELASTICSEARCH_URIS:http://localhost:9200}
       connection-timeout: 10s
       socket-timeout: 30s
   

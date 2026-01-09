@@ -101,6 +101,7 @@ services:
       - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
       - SPRING_REDIS_HOST=redis
       - USER_SERVICE_URL=http://user-service:8081
+      - GOOGLE_PLACES_API_KEY=AIzaSyAiIAWs0bgek00BYeWhVLT4MH3sGRwOk04
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -255,7 +256,14 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - NEXT_PUBLIC_API_URL=http://api-gateway:8080
+      - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_c2FmZS1oZXJvbi02Mi5jbGVyay5hY2NvdW50cy5kZXYk
+      - CLERK_SECRET_KEY=sk_test_Jvr7e1Q5VSKYR6i2mdXCqYSv6cmgxDNo3gbC4EH6vY
+      - NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+      - NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+      - NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
+      - NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
+      - NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyAiIAWs0bgek00BYeWhVLT4MH3sGRwOk04
     depends_on:
       - api-gateway
     networks:
