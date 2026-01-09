@@ -43,7 +43,7 @@ clerk:
   jwks:
     url: ${CLERK_JWKS_URL:https://safe-heron-62.clerk.accounts.dev/.well-known/jwks.json}
   secret:
-    key: ${CLERK_SECRET_KEY:sk_test_Jvr7e1Q5VSKYR6i2mdXCqYSv6cmgxDNo3gbC4EH6vY}
+    key: ${CLERK_SECRET_KEY}
 
 # Actuator endpoints
 management:
