@@ -1,17 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar, Plus, Cloud, Sun, CloudRain, Snowflake } from 'lucide-react';
+import { Calendar, Plus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { DayPlan, ScheduledActivity, WeatherForecast } from '@/lib/api';
+import { DayPlan, ScheduledActivity } from '@/lib/api';
 import ActivityCard from './ActivityCard';
 
 interface DayPlanCardProps {
   dayPlan: DayPlan;
   dayNumber: number;
-  weather?: WeatherForecast;
   onActivityEdit?: (activity: ScheduledActivity) => void;
   onActivityRemove?: (dayPlanId: string, activityId: string) => void;
   onActivityTimeChange?: (dayPlanId: string, activityId: string, startTime: string, endTime: string) => void;
@@ -23,7 +22,6 @@ interface DayPlanCardProps {
 export default function DayPlanCard({
   dayPlan,
   dayNumber,
-  weather,
   onActivityEdit,
   onActivityRemove,
   onActivityTimeChange,
@@ -39,16 +37,6 @@ export default function DayPlanCard({
       month: 'long',
       day: 'numeric'
     });
-  };
-
-  const getWeatherIcon = (condition: string) => {
-    const icons: Record<string, React.ReactElement> = {
-      'clear': <Sun className="w-4 h-4 text-yellow-500" />,
-      'cloudy': <Cloud className="w-4 h-4 text-gray-500" />,
-      'rain': <CloudRain className="w-4 h-4 text-blue-500" />,
-      'snow': <Snowflake className="w-4 h-4 text-blue-200" />,
-    };
-    return icons[condition.toLowerCase()] || <Cloud className="w-4 h-4 text-gray-500" />;
   };
 
   const handleDragStart = (activityId: string) => {
@@ -107,15 +95,6 @@ export default function DayPlanCard({
           </div>
           
           <div className="flex items-center gap-2">
-            {weather && (
-              <div className="flex items-center gap-2 text-sm">
-                {getWeatherIcon(weather.condition)}
-                <span className="text-muted-foreground">
-                  {weather.temperature.max}°/{weather.temperature.min}°
-                </span>
-              </div>
-            )}
-            
             <Badge variant="outline">
               {dayPlan.activities.length} activities
             </Badge>
@@ -127,12 +106,6 @@ export default function DayPlanCard({
             )}
           </div>
         </div>
-
-        {weather && (
-          <div className="text-sm text-muted-foreground">
-            {weather.description} • {weather.humidity}% humidity • {weather.windSpeed} mph wind
-          </div>
-        )}
       </CardHeader>
 
       <CardContent className="space-y-3">

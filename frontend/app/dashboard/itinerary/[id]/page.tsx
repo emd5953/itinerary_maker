@@ -12,10 +12,9 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { apiService, type Itinerary, type ScheduledActivity, type WeatherForecast, type Activity } from '@/lib/api';
+import { apiService, type Itinerary, type ScheduledActivity, type Activity } from '@/lib/api';
 import DayPlanCard from '@/components/itinerary/DayPlanCard';
 import GPSMap from '@/components/itinerary/GPSMap';
-import WeatherCard from '@/components/itinerary/WeatherCard';
 import LocationServices from '@/components/itinerary/LocationServices';
 import ActivitySearchModal from '@/components/itinerary/ActivitySearchModal';
 import ActivityEditModal from '@/components/itinerary/ActivityEditModal';
@@ -36,11 +35,9 @@ export default function ItineraryPage() {
   const params = useParams();
   const router = useRouter();
   const [itinerary, setItinerary] = useState<Itinerary | null>(null);
-  const [weather, setWeather] = useState<WeatherForecast[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [showWeather, setShowWeather] = useState(true);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [selectedMapDay, setSelectedMapDay] = useState(1);
   const [showActivitySearch, setShowActivitySearch] = useState(false);
@@ -64,21 +61,6 @@ export default function ItineraryPage() {
       const token = await getToken();
       const data = await apiService.getItinerary(itineraryId, token);
       setItinerary(data);
-
-      // Load weather forecast
-      try {
-        console.log('🌤️ Loading weather for:', data.destination, 'from', data.startDate, 'to', data.endDate);
-        const weatherData = await apiService.getWeatherForecast(
-          data.destination,
-          data.startDate,
-          data.endDate
-        );
-        console.log('🌤️ Weather data received:', weatherData);
-        setWeather(weatherData);
-      } catch (weatherError) {
-        console.error('🌤️ Weather API error:', weatherError);
-        // Don't fail the whole page if weather fails
-      }
 
     } catch (error) {
       console.error('Error loading itinerary:', error);
@@ -365,33 +347,7 @@ export default function ItineraryPage() {
               </Button>
             </div>
           </div>
-
-          {/* Controls */}
-          <div className="flex items-center gap-4">
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="show-weather"
-                checked={showWeather}
-                onCheckedChange={(checked) => {
-                  console.log('🌤️ Weather toggle changed to:', checked);
-                  setShowWeather(checked);
-                  if (checked) {
-                    console.log('🌤️ Loading weather data...');
-                    loadItinerary();
-                  }
-                }}
-              />
-              <Label htmlFor="show-weather">Show weather</Label>
-            </div>
-          </div>
         </div>
-
-        {/* Weather Forecast */}
-        {showWeather && weather.length > 0 && (
-          <div className="mb-6">
-            <WeatherCard weather={weather} destination={itinerary.destination} />
-          </div>
-        )}
 
         {/* Day Plans */}
         {viewMode === 'list' ? (
@@ -401,7 +357,6 @@ export default function ItineraryPage() {
                 key={dayPlan.id}
                 dayPlan={dayPlan}
                 dayNumber={index + 1}
-                weather={weather.find(w => w.date === dayPlan.date)}
                 onActivityEdit={isEditing ? handleActivityEdit : undefined}
                 onActivityRemove={isEditing ? handleActivityRemove : undefined}
                 onActivityTimeChange={isEditing ? handleActivityTimeChange : undefined}
@@ -430,9 +385,6 @@ export default function ItineraryPage() {
                 activities={itinerary.dayPlans.flatMap(day => day.activities)}
                 destination={itinerary.destination}
               />
-              {showWeather && weather.length > 0 && (
-                <WeatherCard weather={weather} destination={itinerary.destination} />
-              )}
             </div>
           </div>
         )}

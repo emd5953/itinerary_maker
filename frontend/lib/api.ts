@@ -133,19 +133,6 @@ export interface Itinerary {
   updatedAt: string;
 }
 
-export interface WeatherForecast {
-  date: string;
-  temperature: {
-    min: number;
-    max: number;
-  };
-  condition: string;
-  description: string;
-  humidity: number;
-  windSpeed: number;
-  icon: string;
-}
-
 export interface TravelTimeResult {
   duration: number; // minutes
   distance: number; // meters
@@ -425,11 +412,6 @@ class ApiService {
       method: 'PUT',
       body: JSON.stringify({ activityIds }),
     }, token);
-  }
-
-  // Weather API
-  async getWeatherForecast(destination: string, startDate: string, endDate: string): Promise<WeatherForecast[]> {
-    return this.request(`/weather/forecast?destination=${encodeURIComponent(destination)}&startDate=${startDate}&endDate=${endDate}`);
   }
 
   // Travel time calculation
